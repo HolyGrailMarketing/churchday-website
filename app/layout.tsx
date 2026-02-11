@@ -4,6 +4,16 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'ChurchDay - Church Management Made Simple',
   description: 'All-in-one church management platform to connect, manage, and grow your congregation',
+  icons: {
+    icon: '/logo.png',
+    apple: '/logo.png',
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'ChurchDay',
+  },
+  themeColor: '#142535',
 }
 
 export default function RootLayout({
