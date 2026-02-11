@@ -252,6 +252,42 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Screenshots Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-primary-900">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              See ChurchDay in Action
+            </h2>
+            <p className="text-lg text-white/60">
+              Explore the intuitive interface that makes church management effortless
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { src: '/IMG_5686.PNG', alt: 'Dashboard Overview' },
+              { src: '/IMG_5690.PNG', alt: 'Member Management' },
+              { src: '/IMG_5692.PNG', alt: 'Attendance Tracking' },
+              { src: '/IMG_5693.PNG', alt: 'Event Calendar' },
+              { src: '/IMG_5694.PNG', alt: 'Donations' },
+              { src: '/IMG_5695.PNG', alt: 'Communication' },
+              { src: '/IMG_5696.PNG', alt: 'Reports' },
+            ].map((screenshot, i) => (
+              <div key={i} className="rounded-xl overflow-hidden shadow-xl border border-white/10 hover:border-gold-400 transition-all hover:shadow-2xl hover:shadow-gold-500/20">
+                <Image
+                  src={screenshot.src}
+                  alt={screenshot.alt}
+                  width={400}
+                  height={800}
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* How It Works */}
       <section id="how-it-works" className="py-20 px-4 sm:px-6 lg:px-8 bg-primary-900">
         <div className="max-w-6xl mx-auto">
