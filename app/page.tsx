@@ -269,13 +269,13 @@ export default function Home() {
 
           <div className="flex gap-5 overflow-x-auto pb-6 snap-x snap-mandatory scrollbar-hide -mx-4 px-4">
             {[
-              { src: '/IMG_5686.PNG', label: 'Dashboard' },
-              { src: '/IMG_5690.PNG', label: 'Members' },
-              { src: '/IMG_5692.PNG', label: 'Attendance' },
-              { src: '/IMG_5693.PNG', label: 'Events' },
-              { src: '/IMG_5694.PNG', label: 'Donations' },
-              { src: '/IMG_5695.PNG', label: 'Messages' },
-              { src: '/IMG_5696.PNG', label: 'Reports' },
+              { src: '/IMG_5686.PNG', label: 'Home' },
+              { src: '/daily inspiration.PNG', label: 'Daily Inspiration' },
+              { src: '/ministries.PNG', label: 'Ministries' },
+              { src: '/create event.PNG', label: 'Create Event' },
+              { src: '/find-church.PNG', label: 'Find Church' },
+              { src: '/login.PNG', label: 'Login' },
+              { src: '/settings.PNG', label: 'Settings' },
             ].map((screenshot, i) => (
               <div key={i} className="flex-shrink-0 snap-center flex flex-col items-center gap-3">
                 <div className="w-[200px] rounded-[24px] overflow-hidden shadow-lg border-[6px] border-primary-900 bg-primary-900">
