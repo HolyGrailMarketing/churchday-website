@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #fbfaf8;
+  color: #2c2b2a;
+}
+
+.gradient-hero {
+  background: linear-gradient(180deg, #3a6a8f 0%, #2c4d6f 30%, #1f3448 70%, #142535 100%);
+  position: relative;
+}
+
+.gradient-hero::before {
+  content: '';
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(212, 168, 94, 0.3) 0%, rgba(236, 200, 105, 0.15) 30%, rgba(74, 123, 167, 0.05) 60%, transparent 80%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.gradient-warm {
+  background: linear-gradient(135deg, #2c4d6f 0%, #1f3448 100%);
+}
+
+.gradient-warm-subtle {
+  background: linear-gradient(135deg, rgba(44, 77, 111, 0.04) 0%, rgba(31, 52, 72, 0.04) 100%);
+}
+
+.btn-primary {
+  @apply px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold hover:shadow-lg hover:shadow-gold-500/25 transition-all duration-300 transform hover:-translate-y-1;
+}
+
+.btn-secondary {
+  @apply px-6 py-3 border-2 border-gold-500 text-gold-500 rounded-lg font-semibold hover:bg-gold-500/10 transition-all duration-300;
+}
