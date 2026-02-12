@@ -2,21 +2,37 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { Menu, X, ArrowRight, CheckCircle2, Users, Calendar, BarChart3, MessageSquare, Zap, Layers, Database, HandCoins, TrendingUp } from 'lucide-react'
+import { Menu, X, ArrowRight, CheckCircle2, Users, Calendar, BarChart3, MessageSquare, Zap, Layers, Database, HandCoins, TrendingUp, Apple, Smartphone } from 'lucide-react'
 
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [demoForm, setDemoForm] = useState({ name: '', email: '', church: '', phone: '' })
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
+  const [downloadModal, setDownloadModal] = useState<'ios' | 'android' | null>(null)
 
-  const handleDemoSubmit = (e: React.FormEvent) => {
+  const handleDemoSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Demo request submitted:', demoForm)
-    setSubmitted(true)
-    setTimeout(() => {
-      setSubmitted(false)
+    setSubmitting(true)
+    setError('')
+
+    try {
+      const res = await fetch('/api/demo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(demoForm),
+      })
+
+      if (!res.ok) throw new Error('Failed to submit')
+
+      setSubmitted(true)
       setDemoForm({ name: '', email: '', church: '', phone: '' })
-    }, 3000)
+    } catch {
+      setError('Something went wrong. Please try again.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -122,7 +138,10 @@ export default function Home() {
 
           {/* App Store Badges */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-10 animate-slide-up">
-            <a href="#" className="inline-block hover:opacity-80 transition-opacity">
+            <button
+              onClick={() => setDownloadModal('ios')}
+              className="inline-block hover:opacity-80 hover:scale-105 transition-all duration-300 cursor-pointer"
+            >
               <svg width="150" height="50" viewBox="0 0 150 50" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect width="150" height="50" rx="10" fill="black"/>
                 <text x="52" y="17" fill="white" fontSize="8" fontFamily="system-ui" fontWeight="400">Download on the</text>
@@ -132,8 +151,11 @@ export default function Home() {
                   <path d="M21.607 11.13a5.593 5.593 0 0 0 1.28-4.01 5.7 5.7 0 0 0-3.687 1.907 5.327 5.327 0 0 0-1.313 3.862 4.71 4.71 0 0 0 3.72-1.76z" fill="white"/>
                 </g>
               </svg>
-            </a>
-            <a href="#" className="inline-block hover:opacity-80 transition-opacity">
+            </button>
+            <button
+              onClick={() => setDownloadModal('android')}
+              className="inline-block hover:opacity-80 hover:scale-105 transition-all duration-300 cursor-pointer"
+            >
               <svg width="168" height="50" viewBox="0 0 168 50" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect width="168" height="50" rx="10" fill="black"/>
                 <text x="62" y="17" fill="white" fontSize="8" fontFamily="system-ui" fontWeight="400">GET IT ON</text>
@@ -145,7 +167,7 @@ export default function Home() {
                   <path d="M24.3 38.6L4.4 49.9c-.8.5-1.8-.1-1.8-1V48.8c0 .2.3.3.8.4L31.5 46.1l-7.2-7.5z" fill="#FBBC05"/>
                 </g>
               </svg>
-            </a>
+            </button>
           </div>
         </div>
       </section>
@@ -495,7 +517,12 @@ export default function Home() {
           <form onSubmit={handleDemoSubmit} className="bg-primary-900 p-8 rounded-2xl shadow-2xl">
             {submitted && (
               <div className="mb-6 p-4 bg-green-500/20 border border-green-400/30 rounded-lg text-green-300">
-                ✓ Thank you! We&apos;ll be in touch soon to schedule your demo.
+                Thank you! We&apos;ll be in touch soon to schedule your demo.
+              </div>
+            )}
+            {error && (
+              <div className="mb-6 p-4 bg-red-500/20 border border-red-400/30 rounded-lg text-red-300">
+                {error}
               </div>
             )}
 
@@ -550,9 +577,10 @@ export default function Home() {
 
               <button
                 type="submit"
-                className="w-full text-lg py-4 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold hover:shadow-2xl hover:shadow-gold-500/25 transition-all duration-300 transform hover:-translate-y-1"
+                disabled={submitting}
+                className="w-full text-lg py-4 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold hover:shadow-2xl hover:shadow-gold-500/25 transition-all duration-300 transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
-                Request Your Demo <ArrowRight className="inline-block ml-2 w-5 h-5" />
+                {submitting ? 'Sending...' : <>Request Your Demo <ArrowRight className="inline-block ml-2 w-5 h-5" /></>}
               </button>
 
               <p className="text-sm text-white/50 text-center">
@@ -574,7 +602,10 @@ export default function Home() {
               </div>
               <p className="text-sm text-white/40 mb-4">Connect. Worship. Grow.</p>
               <div className="flex flex-col gap-3">
-                <a href="#" className="inline-block hover:opacity-80 transition-opacity">
+                <button
+                  onClick={() => setDownloadModal('ios')}
+                  className="inline-block hover:opacity-80 hover:scale-105 transition-all duration-300 cursor-pointer"
+                >
                   <svg width="120" height="40" viewBox="0 0 150 50" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect width="150" height="50" rx="10" fill="black"/>
                     <text x="52" y="17" fill="white" fontSize="8" fontFamily="system-ui" fontWeight="400">Download on the</text>
@@ -584,8 +615,11 @@ export default function Home() {
                       <path d="M21.607 11.13a5.593 5.593 0 0 0 1.28-4.01 5.7 5.7 0 0 0-3.687 1.907 5.327 5.327 0 0 0-1.313 3.862 4.71 4.71 0 0 0 3.72-1.76z" fill="white"/>
                     </g>
                   </svg>
-                </a>
-                <a href="#" className="inline-block hover:opacity-80 transition-opacity">
+                </button>
+                <button
+                  onClick={() => setDownloadModal('android')}
+                  className="inline-block hover:opacity-80 hover:scale-105 transition-all duration-300 cursor-pointer"
+                >
                   <svg width="135" height="40" viewBox="0 0 168 50" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect width="168" height="50" rx="10" fill="black"/>
                     <text x="62" y="17" fill="white" fontSize="8" fontFamily="system-ui" fontWeight="400">GET IT ON</text>
@@ -597,7 +631,7 @@ export default function Home() {
                       <path d="M24.3 38.6L4.4 49.9c-.8.5-1.8-.1-1.8-1V48.8c0 .2.3.3.8.4L31.5 46.1l-7.2-7.5z" fill="#FBBC05"/>
                     </g>
                   </svg>
-                </a>
+                </button>
               </div>
             </div>
             <div>
@@ -629,6 +663,130 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Download Modal */}
+      {downloadModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-slide-up">
+            {/* Background decoration */}
+            <div className="absolute top-0 right-0 w-40 h-40 bg-gold-100 rounded-full -mr-20 -mt-20 opacity-30" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary-100 rounded-full -ml-16 -mb-16 opacity-20" />
+
+            {/* Close button */}
+            <button
+              onClick={() => setDownloadModal(null)}
+              className="absolute top-4 right-4 z-10 p-2 hover:bg-primary-100 rounded-full transition"
+            >
+              <X className="w-6 h-6 text-primary-900" />
+            </button>
+
+            {/* Content */}
+            <div className="relative z-10 p-8 text-center">
+              {downloadModal === 'ios' ? (
+                <>
+                  {/* iOS Modal */}
+                  <div className="mb-6 inline-block">
+                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-gold-400 to-gold-500 flex items-center justify-center shadow-lg">
+                      <Apple className="w-10 h-10 text-white" />
+                    </div>
+                  </div>
+
+                  <h2 className="text-3xl font-bold text-primary-900 mb-3">
+                    Get ChurchDay on iOS
+                  </h2>
+                  <p className="text-gold-600 font-semibold mb-2">Coming Soon to the App Store</p>
+                  <p className="text-sm text-primary-500 mb-8">
+                    Be notified when ChurchDay launches. Join thousands of church leaders ready to Connect, Worship, and Grow.
+                  </p>
+
+                  {/* Features list */}
+                  <div className="bg-primary-50 rounded-lg p-6 mb-6 text-left">
+                    <ul className="space-y-3">
+                      <li className="flex gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-sm text-primary-700">Instant member access</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-sm text-primary-700">Real-time notifications</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-sm text-primary-700">Seamless sync with web</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setDownloadModal(null)
+                      setTimeout(() => {
+                        document.getElementById('demo-form')?.scrollIntoView({ behavior: 'smooth' })
+                      }, 300)
+                    }}
+                    className="block w-full px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold hover:shadow-lg hover:shadow-gold-500/25 transition-all duration-300 transform hover:-translate-y-1 mb-3"
+                  >
+                    Notify Me
+                  </button>
+                  <p className="text-xs text-primary-500">
+                    Launch: Q1 2026
+                  </p>
+                </>
+              ) : (
+                <>
+                  {/* Android Modal */}
+                  <div className="mb-6 inline-block">
+                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-gold-400 to-gold-500 flex items-center justify-center shadow-lg">
+                      <Smartphone className="w-10 h-10 text-white" />
+                    </div>
+                  </div>
+
+                  <h2 className="text-3xl font-bold text-primary-900 mb-3">
+                    Get ChurchDay on Android
+                  </h2>
+                  <p className="text-gold-600 font-semibold mb-2">Coming Soon to Google Play</p>
+                  <p className="text-sm text-primary-500 mb-8">
+                    Be notified when ChurchDay launches. Join thousands of church leaders ready to Connect, Worship, and Grow.
+                  </p>
+
+                  {/* Features list */}
+                  <div className="bg-primary-50 rounded-lg p-6 mb-6 text-left">
+                    <ul className="space-y-3">
+                      <li className="flex gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-sm text-primary-700">Offline support</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-sm text-primary-700">Fast performance</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-sm text-primary-700">Device optimization</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setDownloadModal(null)
+                      setTimeout(() => {
+                        document.getElementById('demo-form')?.scrollIntoView({ behavior: 'smooth' })
+                      }, 300)
+                    }}
+                    className="block w-full px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold hover:shadow-lg hover:shadow-gold-500/25 transition-all duration-300 transform hover:-translate-y-1 mb-3"
+                  >
+                    Notify Me
+                  </button>
+                  <p className="text-xs text-primary-500">
+                    Launch: Q1 2026
+                  </p>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
