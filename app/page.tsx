@@ -2,15 +2,51 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { Menu, X, ArrowRight, CheckCircle2, Users, Calendar, BarChart3, MessageSquare, Zap, Layers, Database, HandCoins, TrendingUp, Apple, Smartphone } from 'lucide-react'
+import { Menu, X, ArrowRight, ArrowLeft, CheckCircle2, Users, Calendar, Clock, BarChart3, MessageSquare, Zap, Layers, Database, HandCoins, TrendingUp, Apple, Smartphone, PartyPopper } from 'lucide-react'
+
+const TIME_SLOTS = ['9:00 AM', '11:00 AM', '2:00 PM', '4:00 PM']
+
+// Next 6 weekdays (Mon–Fri), computed client-side.
+function getUpcomingDays() {
+  const days: { value: string; label: string; sub: string }[] = []
+  const date = new Date()
+  date.setDate(date.getDate() + 1)
+  while (days.length < 6) {
+    const day = date.getDay()
+    if (day !== 0 && day !== 6) {
+      days.push({
+        value: date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }),
+        label: date.toLocaleDateString('en-US', { weekday: 'short' }),
+        sub: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      })
+    }
+    date.setDate(date.getDate() + 1)
+  }
+  return days
+}
 
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [demoForm, setDemoForm] = useState({ name: '', email: '', church: '', phone: '' })
-  const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [downloadModal, setDownloadModal] = useState<'ios' | 'android' | null>(null)
+
+  // Schedule-a-demo wizard
+  const [scheduleOpen, setScheduleOpen] = useState(false)
+  const [step, setStep] = useState(0) // 0=day, 1=time, 2=details, 3=success
+  const [selectedDate, setSelectedDate] = useState('')
+  const [selectedTime, setSelectedTime] = useState('')
+  const upcomingDays = getUpcomingDays()
+
+  const openSchedule = () => {
+    setStep(0)
+    setSelectedDate('')
+    setSelectedTime('')
+    setError('')
+    setDemoForm({ name: '', email: '', church: '', phone: '' })
+    setScheduleOpen(true)
+  }
 
   const handleDemoSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -21,12 +57,12 @@ export default function Home() {
       const res = await fetch('/api/demo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(demoForm),
+        body: JSON.stringify({ ...demoForm, preferredDate: selectedDate, preferredTime: selectedTime }),
       })
 
       if (!res.ok) throw new Error('Failed to submit')
 
-      setSubmitted(true)
+      setStep(3)
       setDemoForm({ name: '', email: '', church: '', phone: '' })
     } catch {
       setError('Something went wrong. Please try again.')
@@ -52,7 +88,7 @@ export default function Home() {
               <a href="#pricing" className="text-white/70 hover:text-gold-400 transition">Pricing</a>
               <a href="#how-it-works" className="text-white/70 hover:text-gold-400 transition">How It Works</a>
               <button
-                onClick={() => document.getElementById('demo-form')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={openSchedule}
                 className="btn-primary"
               >
                 Request Demo
@@ -77,7 +113,7 @@ export default function Home() {
               <button
                 onClick={() => {
                   setMobileMenuOpen(false)
-                  document.getElementById('demo-form')?.scrollIntoView({ behavior: 'smooth' })
+                  openSchedule()
                 }}
                 className="btn-primary w-full mt-2"
               >
@@ -123,7 +159,7 @@ export default function Home() {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up">
             <button
-              onClick={() => document.getElementById('demo-form')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={openSchedule}
               className="px-8 py-4 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold hover:shadow-2xl hover:shadow-gold-500/25 transition-all duration-300 transform hover:-translate-y-1"
             >
               Schedule Your Demo <ArrowRight className="inline-block ml-2 w-5 h-5" />
@@ -487,7 +523,7 @@ export default function Home() {
                   ))}
                 </ul>
                 <button
-                  onClick={() => document.getElementById('demo-form')?.scrollIntoView({ behavior: 'smooth' })}
+                  onClick={openSchedule}
                   className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 ${
                     plan.highlighted
                       ? "bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 hover:shadow-lg hover:shadow-gold-500/25"
@@ -499,95 +535,6 @@ export default function Home() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Demo Form Section */}
-      <section id="demo-form" className="py-20 px-4 sm:px-6 lg:px-8 bg-[#fbfaf8]">
-        <div className="max-w-2xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-primary-900 mb-4">
-              See ChurchDay in Action
-            </h2>
-            <p className="text-lg text-primary-700/70">
-              Schedule a personalized demo and discover how ChurchDay can transform your church management
-            </p>
-          </div>
-
-          <form onSubmit={handleDemoSubmit} className="bg-primary-900 p-8 rounded-2xl shadow-2xl">
-            {submitted && (
-              <div className="mb-6 p-4 bg-green-500/20 border border-green-400/30 rounded-lg text-green-300">
-                Thank you! We&apos;ll be in touch soon to schedule your demo.
-              </div>
-            )}
-            {error && (
-              <div className="mb-6 p-4 bg-red-500/20 border border-red-400/30 rounded-lg text-red-300">
-                {error}
-              </div>
-            )}
-
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">Full Name</label>
-                <input
-                  type="text"
-                  required
-                  value={demoForm.name}
-                  onChange={(e) => setDemoForm({ ...demoForm, name: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-gold-400 focus:ring-2 focus:ring-gold-400/20"
-                  placeholder="Pastor John Smith"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">Church Name</label>
-                <input
-                  type="text"
-                  required
-                  value={demoForm.church}
-                  onChange={(e) => setDemoForm({ ...demoForm, church: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-gold-400 focus:ring-2 focus:ring-gold-400/20"
-                  placeholder="Your Church Name"
-                />
-              </div>
-
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-white/80 mb-2">Email</label>
-                  <input
-                    type="email"
-                    required
-                    value={demoForm.email}
-                    onChange={(e) => setDemoForm({ ...demoForm, email: e.target.value })}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-gold-400 focus:ring-2 focus:ring-gold-400/20"
-                    placeholder="you@church.com"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-white/80 mb-2">Phone</label>
-                  <input
-                    type="tel"
-                    value={demoForm.phone}
-                    onChange={(e) => setDemoForm({ ...demoForm, phone: e.target.value })}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-gold-400 focus:ring-2 focus:ring-gold-400/20"
-                    placeholder="(555) 123-4567"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full text-lg py-4 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold hover:shadow-2xl hover:shadow-gold-500/25 transition-all duration-300 transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              >
-                {submitting ? 'Sending...' : <>Request Your Demo <ArrowRight className="inline-block ml-2 w-5 h-5" /></>}
-              </button>
-
-              <p className="text-sm text-white/50 text-center">
-                We&apos;ll respond within 24 hours. No credit card required.
-              </p>
-            </div>
-          </form>
         </div>
       </section>
 
@@ -720,9 +667,7 @@ export default function Home() {
                   <button
                     onClick={() => {
                       setDownloadModal(null)
-                      setTimeout(() => {
-                        document.getElementById('demo-form')?.scrollIntoView({ behavior: 'smooth' })
-                      }, 300)
+                      setTimeout(openSchedule, 300)
                     }}
                     className="block w-full px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold hover:shadow-lg hover:shadow-gold-500/25 transition-all duration-300 transform hover:-translate-y-1 mb-3"
                   >
@@ -770,9 +715,7 @@ export default function Home() {
                   <button
                     onClick={() => {
                       setDownloadModal(null)
-                      setTimeout(() => {
-                        document.getElementById('demo-form')?.scrollIntoView({ behavior: 'smooth' })
-                      }, 300)
+                      setTimeout(openSchedule, 300)
                     }}
                     className="block w-full px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold hover:shadow-lg hover:shadow-gold-500/25 transition-all duration-300 transform hover:-translate-y-1 mb-3"
                   >
@@ -782,6 +725,203 @@ export default function Home() {
                     Launch: Q1 2026
                   </p>
                 </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Schedule a Demo Wizard */}
+      {scheduleOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-slide-up">
+            {/* Background decoration */}
+            <div className="absolute top-0 right-0 w-40 h-40 bg-gold-100 rounded-full -mr-20 -mt-20 opacity-30" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary-100 rounded-full -ml-16 -mb-16 opacity-20" />
+
+            {/* Close button */}
+            <button
+              onClick={() => setScheduleOpen(false)}
+              className="absolute top-4 right-4 z-10 p-2 hover:bg-primary-100 rounded-full transition"
+            >
+              <X className="w-6 h-6 text-primary-900" />
+            </button>
+
+            <div className="relative z-10 p-8">
+              {/* Progress indicator */}
+              {step < 3 && (
+                <div className="flex gap-2 mb-8 max-w-[180px]">
+                  {[0, 1, 2].map((i) => (
+                    <div
+                      key={i}
+                      className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
+                        i <= step ? 'bg-gradient-to-r from-gold-500 to-gold-400' : 'bg-primary-100'
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Step 0 — Pick a day */}
+              {step === 0 && (
+                <div className="text-center">
+                  <div className="mb-5 inline-block">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gold-400 to-gold-500 flex items-center justify-center shadow-lg">
+                      <Calendar className="w-8 h-8 text-white" />
+                    </div>
+                  </div>
+                  <h2 className="text-2xl font-bold text-primary-900 mb-2">When works for you?</h2>
+                  <p className="text-sm text-primary-500 mb-6">Pick a day that suits your church best.</p>
+
+                  <div className="grid grid-cols-3 gap-3 mb-2">
+                    {upcomingDays.map((day) => (
+                      <button
+                        key={day.value}
+                        onClick={() => {
+                          setSelectedDate(day.value)
+                          setStep(1)
+                        }}
+                        className={`py-4 rounded-xl border-2 transition-all duration-200 ${
+                          selectedDate === day.value
+                            ? 'border-gold-400 bg-gold-50'
+                            : 'border-primary-100 hover:border-gold-300 hover:bg-gold-50/40'
+                        }`}
+                      >
+                        <span className="block text-xs font-medium text-primary-500 uppercase tracking-wide">{day.label}</span>
+                        <span className="block text-sm font-bold text-primary-900 mt-1">{day.sub}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Step 1 — Pick a time */}
+              {step === 1 && (
+                <div className="text-center">
+                  <div className="mb-5 inline-block">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gold-400 to-gold-500 flex items-center justify-center shadow-lg">
+                      <Clock className="w-8 h-8 text-white" />
+                    </div>
+                  </div>
+                  <h2 className="text-2xl font-bold text-primary-900 mb-2">Pick a time</h2>
+                  <p className="text-sm text-primary-500 mb-6">{selectedDate}</p>
+
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    {TIME_SLOTS.map((slot) => (
+                      <button
+                        key={slot}
+                        onClick={() => {
+                          setSelectedTime(slot)
+                          setStep(2)
+                        }}
+                        className={`py-4 rounded-xl border-2 font-semibold transition-all duration-200 ${
+                          selectedTime === slot
+                            ? 'border-transparent bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900'
+                            : 'border-primary-100 text-primary-900 hover:border-gold-300 hover:bg-gold-50/40'
+                        }`}
+                      >
+                        {slot}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => setStep(0)}
+                    className="inline-flex items-center gap-1 text-sm text-primary-500 hover:text-gold-600 transition"
+                  >
+                    <ArrowLeft className="w-4 h-4" /> Back
+                  </button>
+                </div>
+              )}
+
+              {/* Step 2 — Your details */}
+              {step === 2 && (
+                <form onSubmit={handleDemoSubmit}>
+                  <h2 className="text-2xl font-bold text-primary-900 mb-1 text-center">Almost there!</h2>
+                  <div className="flex items-center justify-center gap-2 text-sm font-medium text-gold-600 mb-6">
+                    <Calendar className="w-4 h-4" /> {selectedDate} at {selectedTime}
+                  </div>
+
+                  {error && (
+                    <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+                      {error}
+                    </div>
+                  )}
+
+                  <div className="space-y-4">
+                    <input
+                      type="text"
+                      required
+                      value={demoForm.name}
+                      onChange={(e) => setDemoForm({ ...demoForm, name: e.target.value })}
+                      className="w-full px-4 py-3 bg-primary-50 border-2 border-primary-100 rounded-lg text-primary-900 placeholder-primary-400 focus:outline-none focus:border-gold-400 focus:bg-white transition"
+                      placeholder="Full name"
+                    />
+                    <input
+                      type="text"
+                      required
+                      value={demoForm.church}
+                      onChange={(e) => setDemoForm({ ...demoForm, church: e.target.value })}
+                      className="w-full px-4 py-3 bg-primary-50 border-2 border-primary-100 rounded-lg text-primary-900 placeholder-primary-400 focus:outline-none focus:border-gold-400 focus:bg-white transition"
+                      placeholder="Church name"
+                    />
+                    <input
+                      type="email"
+                      required
+                      value={demoForm.email}
+                      onChange={(e) => setDemoForm({ ...demoForm, email: e.target.value })}
+                      className="w-full px-4 py-3 bg-primary-50 border-2 border-primary-100 rounded-lg text-primary-900 placeholder-primary-400 focus:outline-none focus:border-gold-400 focus:bg-white transition"
+                      placeholder="Email address"
+                    />
+                    <input
+                      type="tel"
+                      value={demoForm.phone}
+                      onChange={(e) => setDemoForm({ ...demoForm, phone: e.target.value })}
+                      className="w-full px-4 py-3 bg-primary-50 border-2 border-primary-100 rounded-lg text-primary-900 placeholder-primary-400 focus:outline-none focus:border-gold-400 focus:bg-white transition"
+                      placeholder="Phone (optional)"
+                    />
+
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="w-full py-3.5 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold hover:shadow-lg hover:shadow-gold-500/25 transition-all duration-300 transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    >
+                      {submitting ? 'Sending...' : <>Lock it in <ArrowRight className="inline-block ml-1 w-5 h-5" /></>}
+                    </button>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setStep(1)}
+                    className="mt-4 inline-flex items-center gap-1 text-sm text-primary-500 hover:text-gold-600 transition"
+                  >
+                    <ArrowLeft className="w-4 h-4" /> Back
+                  </button>
+                </form>
+              )}
+
+              {/* Step 3 — Success */}
+              {step === 3 && (
+                <div className="text-center py-2">
+                  <div className="mb-5 inline-block">
+                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-gold-400 to-gold-500 flex items-center justify-center shadow-lg">
+                      <PartyPopper className="w-10 h-10 text-white" />
+                    </div>
+                  </div>
+                  <h2 className="text-2xl font-bold text-primary-900 mb-3">You&apos;re all set!</h2>
+                  <p className="text-sm text-primary-500 mb-2">
+                    We&apos;ll reach out to confirm your demo for
+                  </p>
+                  <div className="inline-flex items-center gap-2 text-base font-semibold text-gold-600 mb-8">
+                    <Calendar className="w-5 h-5" /> {selectedDate} at {selectedTime}
+                  </div>
+                  <button
+                    onClick={() => setScheduleOpen(false)}
+                    className="block w-full px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold hover:shadow-lg hover:shadow-gold-500/25 transition-all duration-300 transform hover:-translate-y-1"
+                  >
+                    Done
+                  </button>
+                </div>
               )}
             </div>
           </div>
