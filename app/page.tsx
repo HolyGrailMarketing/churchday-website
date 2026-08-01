@@ -688,7 +688,7 @@ export default function Home() {
                 Notify Me
               </button>
               <p className="text-xs text-primary-500">
-                Launch: Q1 2026
+                In active development — we&apos;ll email you the moment it&apos;s live.
               </p>
             </div>
           </div>
