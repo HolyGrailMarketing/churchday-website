@@ -2,7 +2,9 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { Menu, X, ArrowRight, ArrowLeft, CheckCircle2, Users, Calendar, Clock, BarChart3, MessageSquare, Zap, Layers, Database, HandCoins, TrendingUp, Apple, Smartphone, PartyPopper } from 'lucide-react'
+import { Menu, X, ArrowRight, ArrowLeft, CheckCircle2, Users, Calendar, Clock, BarChart3, MessageSquare, Zap, Layers, Database, HandCoins, TrendingUp, Smartphone, PartyPopper } from 'lucide-react'
+
+const APP_STORE_URL = 'https://apps.apple.com/us/app/churchday/id6765494714'
 
 const TIME_SLOTS = ['9:00 AM', '11:00 AM', '2:00 PM', '4:00 PM']
 
@@ -30,41 +32,11 @@ export default function Home() {
   const [demoForm, setDemoForm] = useState({ name: '', email: '', church: '', phone: '' })
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
-  const [downloadModal, setDownloadModal] = useState<'ios' | 'android' | null>(null)
+  // iOS ships on the App Store; Android is still pre-launch.
+  const [downloadModal, setDownloadModal] = useState<'android' | null>(null)
 
-  // iOS TestFlight beta flow
-  const [betaStep, setBetaStep] = useState(0) // 0=info, 1=form, 2=success
-  const [betaForm, setBetaForm] = useState({ name: '', email: '', phone: '' })
-  const [betaSubmitting, setBetaSubmitting] = useState(false)
-  const [betaError, setBetaError] = useState('')
-
-  const openDownload = (platform: 'ios' | 'android') => {
-    setBetaStep(0)
-    setBetaError('')
-    setBetaForm({ name: '', email: '', phone: '' })
+  const openDownload = (platform: 'android') => {
     setDownloadModal(platform)
-  }
-
-  const handleBetaSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setBetaSubmitting(true)
-    setBetaError('')
-
-    try {
-      const res = await fetch('/api/beta', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(betaForm),
-      })
-
-      if (!res.ok) throw new Error('Failed to submit')
-
-      setBetaStep(2)
-    } catch {
-      setBetaError('Something went wrong. Please try again.')
-    } finally {
-      setBetaSubmitting(false)
-    }
   }
 
   // Schedule-a-demo wizard
@@ -209,8 +181,11 @@ export default function Home() {
 
           {/* App Store Badges */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-10 animate-slide-up">
-            <button
-              onClick={() => openDownload('ios')}
+            <a
+              href={APP_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Download ChurchDay on the App Store"
               className="inline-block hover:opacity-80 hover:scale-105 transition-all duration-300 cursor-pointer"
             >
               <svg width="150" height="50" viewBox="0 0 150 50" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -222,7 +197,7 @@ export default function Home() {
                   <path d="M21.607 11.13a5.593 5.593 0 0 0 1.28-4.01 5.7 5.7 0 0 0-3.687 1.907 5.327 5.327 0 0 0-1.313 3.862 4.71 4.71 0 0 0 3.72-1.76z" fill="white"/>
                 </g>
               </svg>
-            </button>
+            </a>
             <button
               onClick={() => openDownload('android')}
               className="inline-block hover:opacity-80 hover:scale-105 transition-all duration-300 cursor-pointer"
@@ -584,8 +559,11 @@ export default function Home() {
               </div>
               <p className="text-sm text-white/40 mb-4">Connect. Worship. Grow.</p>
               <div className="flex flex-col gap-3">
-                <button
-                  onClick={() => openDownload('ios')}
+                <a
+                  href={APP_STORE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Download ChurchDay on the App Store"
                   className="inline-block hover:opacity-80 hover:scale-105 transition-all duration-300 cursor-pointer"
                 >
                   <svg width="120" height="40" viewBox="0 0 150 50" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -597,7 +575,7 @@ export default function Home() {
                       <path d="M21.607 11.13a5.593 5.593 0 0 0 1.28-4.01 5.7 5.7 0 0 0-3.687 1.907 5.327 5.327 0 0 0-1.313 3.862 4.71 4.71 0 0 0 3.72-1.76z" fill="white"/>
                     </g>
                   </svg>
-                </button>
+                </a>
                 <button
                   onClick={() => openDownload('android')}
                   className="inline-block hover:opacity-80 hover:scale-105 transition-all duration-300 cursor-pointer"
@@ -667,180 +645,51 @@ export default function Home() {
 
             {/* Content */}
             <div className="relative z-10 p-8 text-center">
-              {downloadModal === 'ios' ? (
-                <>
-                  {/* iOS — Public Beta via TestFlight */}
-                  <div className="mb-6 inline-block">
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-gold-400 to-gold-500 flex items-center justify-center shadow-lg">
-                      <Apple className="w-10 h-10 text-white" />
-                    </div>
-                  </div>
+              {/* Android — pre-launch, Google Play */}
+              <div className="mb-6 inline-block">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-gold-400 to-gold-500 flex items-center justify-center shadow-lg">
+                  <Smartphone className="w-10 h-10 text-white" />
+                </div>
+              </div>
 
-                  {betaStep === 0 && (
-                    <>
-                      <span className="inline-block px-3 py-1 bg-gold-50 border border-gold-200 text-gold-600 rounded-full text-xs font-semibold mb-3 uppercase tracking-wide">
-                        Public Beta
-                      </span>
-                      <h2 className="text-3xl font-bold text-primary-900 mb-3">
-                        Now in Public Beta
-                      </h2>
-                      <p className="text-sm text-primary-500 mb-6">
-                        ChurchDay for iOS is in public beta. To try it, you&apos;ll install it through Apple&apos;s free <span className="font-semibold text-primary-700">TestFlight</span> app. We&apos;ll happily send an invite to anyone who wants to test it and share feedback.
-                      </p>
+              <h2 className="text-3xl font-bold text-primary-900 mb-3">
+                Get ChurchDay on Android
+              </h2>
+              <p className="text-gold-600 font-semibold mb-2">Coming Soon to Google Play</p>
+              <p className="text-sm text-primary-500 mb-8">
+                Be notified when ChurchDay launches. Join thousands of church leaders ready to Connect, Worship, and Grow.
+              </p>
 
-                      <div className="bg-primary-50 rounded-lg p-6 mb-6 text-left">
-                        <ul className="space-y-3">
-                          <li className="flex gap-2">
-                            <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                            <span className="text-sm text-primary-700">Get early access before the public launch</span>
-                          </li>
-                          <li className="flex gap-2">
-                            <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                            <span className="text-sm text-primary-700">Install in minutes via Apple TestFlight</span>
-                          </li>
-                          <li className="flex gap-2">
-                            <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                            <span className="text-sm text-primary-700">Help shape the app with your feedback</span>
-                          </li>
-                        </ul>
-                      </div>
+              {/* Features list */}
+              <div className="bg-primary-50 rounded-lg p-6 mb-6 text-left">
+                <ul className="space-y-3">
+                  <li className="flex gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-sm text-primary-700">Offline support</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-sm text-primary-700">Fast performance</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-sm text-primary-700">Device optimization</span>
+                  </li>
+                </ul>
+              </div>
 
-                      <button
-                        onClick={() => setBetaStep(1)}
-                        className="block w-full px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold hover:shadow-lg hover:shadow-gold-500/25 transition-all duration-300 transform hover:-translate-y-1"
-                      >
-                        Next <ArrowRight className="inline-block ml-1 w-5 h-5" />
-                      </button>
-                    </>
-                  )}
-
-                  {betaStep === 1 && (
-                    <form onSubmit={handleBetaSubmit} className="text-left">
-                      <h2 className="text-2xl font-bold text-primary-900 mb-1 text-center">Get your invite</h2>
-                      <p className="text-sm text-primary-500 mb-6 text-center">
-                        Tell us where to send your TestFlight invite.
-                      </p>
-
-                      {betaError && (
-                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
-                          {betaError}
-                        </div>
-                      )}
-
-                      <div className="space-y-4">
-                        <input
-                          type="text"
-                          required
-                          value={betaForm.name}
-                          onChange={(e) => setBetaForm({ ...betaForm, name: e.target.value })}
-                          className="w-full px-4 py-3 bg-primary-50 border-2 border-primary-100 rounded-lg text-primary-900 placeholder-primary-400 focus:outline-none focus:border-gold-400 focus:bg-white transition"
-                          placeholder="Full name"
-                        />
-                        <input
-                          type="email"
-                          required
-                          value={betaForm.email}
-                          onChange={(e) => setBetaForm({ ...betaForm, email: e.target.value })}
-                          className="w-full px-4 py-3 bg-primary-50 border-2 border-primary-100 rounded-lg text-primary-900 placeholder-primary-400 focus:outline-none focus:border-gold-400 focus:bg-white transition"
-                          placeholder="Email address"
-                        />
-                        <input
-                          type="tel"
-                          value={betaForm.phone}
-                          onChange={(e) => setBetaForm({ ...betaForm, phone: e.target.value })}
-                          className="w-full px-4 py-3 bg-primary-50 border-2 border-primary-100 rounded-lg text-primary-900 placeholder-primary-400 focus:outline-none focus:border-gold-400 focus:bg-white transition"
-                          placeholder="Phone (optional)"
-                        />
-
-                        <button
-                          type="submit"
-                          disabled={betaSubmitting}
-                          className="w-full py-3.5 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold hover:shadow-lg hover:shadow-gold-500/25 transition-all duration-300 transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                        >
-                          {betaSubmitting ? 'Sending...' : <>Send my invite <ArrowRight className="inline-block ml-1 w-5 h-5" /></>}
-                        </button>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => setBetaStep(0)}
-                        className="mt-4 inline-flex items-center gap-1 text-sm text-primary-500 hover:text-gold-600 transition"
-                      >
-                        <ArrowLeft className="w-4 h-4" /> Back
-                      </button>
-                    </form>
-                  )}
-
-                  {betaStep === 2 && (
-                    <>
-                      <h2 className="text-2xl font-bold text-primary-900 mb-3">Invite on its way!</h2>
-                      <p className="text-sm text-primary-500 mb-2">
-                        We just emailed your TestFlight invite to
-                      </p>
-                      <p className="text-base font-semibold text-gold-600 mb-6 break-all">{betaForm.email}</p>
-                      <div className="bg-primary-50 rounded-lg p-5 mb-6 text-left">
-                        <p className="text-sm text-primary-700">
-                          Open the email on your iPhone, install Apple&apos;s TestFlight app, and tap the invite. Can&apos;t find it? Check your spam folder.
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => setDownloadModal(null)}
-                        className="block w-full px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold hover:shadow-lg hover:shadow-gold-500/25 transition-all duration-300 transform hover:-translate-y-1"
-                      >
-                        Done
-                      </button>
-                    </>
-                  )}
-                </>
-              ) : (
-                <>
-                  {/* Android Modal */}
-                  <div className="mb-6 inline-block">
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-gold-400 to-gold-500 flex items-center justify-center shadow-lg">
-                      <Smartphone className="w-10 h-10 text-white" />
-                    </div>
-                  </div>
-
-                  <h2 className="text-3xl font-bold text-primary-900 mb-3">
-                    Get ChurchDay on Android
-                  </h2>
-                  <p className="text-gold-600 font-semibold mb-2">Coming Soon to Google Play</p>
-                  <p className="text-sm text-primary-500 mb-8">
-                    Be notified when ChurchDay launches. Join thousands of church leaders ready to Connect, Worship, and Grow.
-                  </p>
-
-                  {/* Features list */}
-                  <div className="bg-primary-50 rounded-lg p-6 mb-6 text-left">
-                    <ul className="space-y-3">
-                      <li className="flex gap-2">
-                        <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                        <span className="text-sm text-primary-700">Offline support</span>
-                      </li>
-                      <li className="flex gap-2">
-                        <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                        <span className="text-sm text-primary-700">Fast performance</span>
-                      </li>
-                      <li className="flex gap-2">
-                        <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                        <span className="text-sm text-primary-700">Device optimization</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <button
-                    onClick={() => {
-                      setDownloadModal(null)
-                      setTimeout(openSchedule, 300)
-                    }}
-                    className="block w-full px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold hover:shadow-lg hover:shadow-gold-500/25 transition-all duration-300 transform hover:-translate-y-1 mb-3"
-                  >
-                    Notify Me
-                  </button>
-                  <p className="text-xs text-primary-500">
-                    Launch: Q1 2026
-                  </p>
-                </>
-              )}
+              <button
+                onClick={() => {
+                  setDownloadModal(null)
+                  setTimeout(openSchedule, 300)
+                }}
+                className="block w-full px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold hover:shadow-lg hover:shadow-gold-500/25 transition-all duration-300 transform hover:-translate-y-1 mb-3"
+              >
+                Notify Me
+              </button>
+              <p className="text-xs text-primary-500">
+                Launch: Q1 2026
+              </p>
             </div>
           </div>
         </div>
