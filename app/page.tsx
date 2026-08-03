@@ -118,16 +118,10 @@ export default function Home() {
               <a
                 href={PORTAL_URL}
                 onClick={() => track('portal_signin', { from: 'nav' })}
-                className="text-white/70 hover:text-gold-400 transition"
+                className="btn-primary"
               >
                 Church sign in
               </a>
-              <button
-                onClick={() => openSchedule('nav')}
-                className="btn-primary"
-              >
-                Request Demo
-              </button>
             </div>
 
             {/* Mobile Menu Button */}
@@ -147,20 +141,14 @@ export default function Home() {
               <a href="#how-it-works" className="block py-2 text-white/70 hover:text-gold-400">How It Works</a>
               <a
                 href={PORTAL_URL}
-                onClick={() => track('portal_signin', { from: 'mobile_nav' })}
-                className="block py-2 text-white/70 hover:text-gold-400"
+                onClick={() => {
+                  setMobileMenuOpen(false)
+                  track('portal_signin', { from: 'mobile_nav' })
+                }}
+                className="btn-primary block w-full mt-2 text-center"
               >
                 Church sign in
               </a>
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false)
-                  openSchedule('mobile_nav')
-                }}
-                className="btn-primary w-full mt-2"
-              >
-                Request Demo
-              </button>
             </div>
           )}
         </div>
