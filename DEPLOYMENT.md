@@ -273,10 +273,34 @@ export default function HeroImage() {
    npm install @sentry/nextjs
    ```
 
-### 3. **Setup Analytics**
-   - Google Analytics 4
-   - Vercel Analytics
-   - Plausible Analytics (privacy-focused)
+### 3. **Analytics** ✅ installed
+
+Vercel Web Analytics + Speed Insights are wired up in `app/layout.tsx`. Both are cookieless and
+collect no personal data, so no consent banner is required.
+
+**The packages alone collect nothing — Analytics must be switched on in the dashboard:**
+
+1. Vercel dashboard → `churchday-website` → **Analytics** tab → **Enable**
+2. Same project → **Speed Insights** tab → **Enable**
+
+Data appears within a few minutes of the next production deploy.
+
+#### Custom events
+
+Tracked via `track()` from `@vercel/analytics` in `app/page.tsx`. Deliberately no name, email or
+church name is sent — those arrive by email through `/api/demo`; analytics stays free of personal
+data.
+
+| Event | Properties | Why |
+|---|---|---|
+| `demo_opened` | `source` — `nav`, `mobile_nav`, `hero`, `pricing_<tier>`, `android_waitlist` | Which CTA actually drives demo requests, so the dead ones can be cut |
+| `demo_step` | `step` — `date_picked`, `time_picked` | Where the 3-step wizard loses people |
+| `demo_submitted` | `preferredTime`, `gavePhone` | **The conversion.** Also shows which demo slots people want |
+| `demo_failed` | — | A spike means `RESEND_API_KEY`/`DEMO_EMAIL` is broken and leads are being silently lost |
+| `app_store_click` | `placement` — `hero`, `footer` | iOS installs driven by the site |
+| `android_waitlist_opened` | `platform` | Real Android demand, ahead of launch |
+
+The funnel to watch: `demo_opened` → `demo_step` → `demo_submitted`.
 
 ### 4. **Setup Email Alerts**
    - Contact form notifications

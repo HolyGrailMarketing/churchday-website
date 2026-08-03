@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { track } from '@vercel/analytics'
 import Image from 'next/image'
 import { Menu, X, ArrowRight, ArrowLeft, CheckCircle2, Users, Calendar, Clock, BarChart3, MessageSquare, Zap, Layers, Database, HandCoins, TrendingUp, Smartphone, PartyPopper } from 'lucide-react'
 
@@ -36,6 +37,7 @@ export default function Home() {
   const [downloadModal, setDownloadModal] = useState<'android' | null>(null)
 
   const openDownload = (platform: 'android') => {
+    track('android_waitlist_opened', { platform })
     setDownloadModal(platform)
   }
 
@@ -46,7 +48,10 @@ export default function Home() {
   const [selectedTime, setSelectedTime] = useState('')
   const upcomingDays = getUpcomingDays()
 
-  const openSchedule = () => {
+  // `source` tells us which CTA actually drives demo requests, so the weak ones
+  // can be cut rather than guessed at.
+  const openSchedule = (source: string = 'unknown') => {
+    track('demo_opened', { source })
     setStep(0)
     setSelectedDate('')
     setSelectedTime('')
@@ -69,9 +74,20 @@ export default function Home() {
 
       if (!res.ok) throw new Error('Failed to submit')
 
+      // The conversion. No name/email/church here — Vercel Analytics is
+      // cookieless and should stay free of personal data; the lead itself
+      // arrives by email via /api/demo.
+      track('demo_submitted', {
+        preferredTime: selectedTime,
+        gavePhone: Boolean(demoForm.phone),
+      })
+
       setStep(3)
       setDemoForm({ name: '', email: '', church: '', phone: '' })
     } catch {
+      // Worth its own event: a spike here means the Resend key or DEMO_EMAIL
+      // is broken and leads are being silently lost.
+      track('demo_failed')
       setError('Something went wrong. Please try again.')
     } finally {
       setSubmitting(false)
@@ -95,7 +111,7 @@ export default function Home() {
               <a href="#pricing" className="text-white/70 hover:text-gold-400 transition">Pricing</a>
               <a href="#how-it-works" className="text-white/70 hover:text-gold-400 transition">How It Works</a>
               <button
-                onClick={openSchedule}
+                onClick={() => openSchedule('nav')}
                 className="btn-primary"
               >
                 Request Demo
@@ -120,7 +136,7 @@ export default function Home() {
               <button
                 onClick={() => {
                   setMobileMenuOpen(false)
-                  openSchedule()
+                  openSchedule('mobile_nav')
                 }}
                 className="btn-primary w-full mt-2"
               >
@@ -166,7 +182,7 @@ export default function Home() {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up">
             <button
-              onClick={openSchedule}
+              onClick={() => openSchedule('hero')}
               className="px-8 py-4 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold hover:shadow-2xl hover:shadow-gold-500/25 transition-all duration-300 transform hover:-translate-y-1"
             >
               Schedule Your Demo <ArrowRight className="inline-block ml-2 w-5 h-5" />
@@ -186,6 +202,7 @@ export default function Home() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Download ChurchDay on the App Store"
+              onClick={() => track('app_store_click', { placement: 'hero' })}
               className="inline-block hover:opacity-80 hover:scale-105 transition-all duration-300 cursor-pointer"
             >
               <svg width="150" height="50" viewBox="0 0 150 50" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -533,7 +550,7 @@ export default function Home() {
                   ))}
                 </ul>
                 <button
-                  onClick={openSchedule}
+                  onClick={() => openSchedule(`pricing_${plan.name.toLowerCase()}`)}
                   className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 ${
                     plan.highlighted
                       ? "bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 hover:shadow-lg hover:shadow-gold-500/25"
@@ -564,6 +581,7 @@ export default function Home() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Download ChurchDay on the App Store"
+                  onClick={() => track('app_store_click', { placement: 'footer' })}
                   className="inline-block hover:opacity-80 hover:scale-105 transition-all duration-300 cursor-pointer"
                 >
                   <svg width="120" height="40" viewBox="0 0 150 50" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -681,7 +699,7 @@ export default function Home() {
               <button
                 onClick={() => {
                   setDownloadModal(null)
-                  setTimeout(openSchedule, 300)
+                  setTimeout(() => openSchedule('android_waitlist'), 300)
                 }}
                 className="block w-full px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold hover:shadow-lg hover:shadow-gold-500/25 transition-all duration-300 transform hover:-translate-y-1 mb-3"
               >
@@ -745,6 +763,7 @@ export default function Home() {
                       <button
                         key={day.value}
                         onClick={() => {
+                          track('demo_step', { step: 'date_picked' })
                           setSelectedDate(day.value)
                           setStep(1)
                         }}
@@ -778,6 +797,7 @@ export default function Home() {
                       <button
                         key={slot}
                         onClick={() => {
+                          track('demo_step', { step: 'time_picked' })
                           setSelectedTime(slot)
                           setStep(2)
                         }}
