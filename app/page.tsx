@@ -7,6 +7,11 @@ import { Menu, X, ArrowRight, ArrowLeft, CheckCircle2, Users, Calendar, Clock, B
 
 const APP_STORE_URL = 'https://apps.apple.com/us/app/churchday/id6765494714'
 
+// The church management portal (Flutter web, deployed separately).
+const PORTAL_URL = 'https://app.church-day.com'
+// `?signup=1` opens the portal on its Sign Up tab rather than Sign In.
+const PORTAL_SIGNUP_URL = `${PORTAL_URL}/?signup=1`
+
 const TIME_SLOTS = ['9:00 AM', '11:00 AM', '2:00 PM', '4:00 PM']
 
 // Next 6 weekdays (Mon–Fri), computed client-side.
@@ -110,6 +115,13 @@ export default function Home() {
               <a href="#features" className="text-white/70 hover:text-gold-400 transition">Features</a>
               <a href="#pricing" className="text-white/70 hover:text-gold-400 transition">Pricing</a>
               <a href="#how-it-works" className="text-white/70 hover:text-gold-400 transition">How It Works</a>
+              <a
+                href={PORTAL_URL}
+                onClick={() => track('portal_signin', { from: 'nav' })}
+                className="text-white/70 hover:text-gold-400 transition"
+              >
+                Church sign in
+              </a>
               <button
                 onClick={() => openSchedule('nav')}
                 className="btn-primary"
@@ -133,6 +145,13 @@ export default function Home() {
               <a href="#features" className="block py-2 text-white/70 hover:text-gold-400">Features</a>
               <a href="#pricing" className="block py-2 text-white/70 hover:text-gold-400">Pricing</a>
               <a href="#how-it-works" className="block py-2 text-white/70 hover:text-gold-400">How It Works</a>
+              <a
+                href={PORTAL_URL}
+                onClick={() => track('portal_signin', { from: 'mobile_nav' })}
+                className="block py-2 text-white/70 hover:text-gold-400"
+              >
+                Church sign in
+              </a>
               <button
                 onClick={() => {
                   setMobileMenuOpen(false)
@@ -187,12 +206,13 @@ export default function Home() {
             >
               Schedule Your Demo <ArrowRight className="inline-block ml-2 w-5 h-5" />
             </button>
-            <button
-              onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+            <a
+              href={PORTAL_SIGNUP_URL}
+              onClick={() => track('portal_signup', { from: 'hero' })}
               className="px-8 py-4 border-2 border-gold-500/40 text-gold-400 rounded-lg font-semibold hover:bg-gold-500/10 transition-all duration-300"
             >
-              Explore Features
-            </button>
+              Set up your church
+            </a>
           </div>
 
           {/* App Store Badges */}
@@ -549,16 +569,19 @@ export default function Home() {
                     </li>
                   ))}
                 </ul>
-                <button
-                  onClick={() => openSchedule(`pricing_${plan.name.toLowerCase()}`)}
-                  className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 ${
+                <a
+                  href={PORTAL_SIGNUP_URL}
+                  onClick={() =>
+                    track('portal_signup', { from: `pricing_${plan.name.toLowerCase()}` })
+                  }
+                  className={`block w-full py-3 rounded-lg font-semibold text-center transition-all duration-300 ${
                     plan.highlighted
                       ? "bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 hover:shadow-lg hover:shadow-gold-500/25"
                       : "border-2 border-primary-900 text-primary-900 hover:bg-primary-900 hover:text-white"
                   }`}
                 >
                   Get Started
-                </button>
+                </a>
               </div>
             ))}
           </div>
@@ -617,6 +640,15 @@ export default function Home() {
               <ul className="space-y-2 text-sm">
                 <li><a href="#features" className="hover:text-gold-400 transition">Features</a></li>
                 <li><a href="#pricing" className="hover:text-gold-400 transition">Pricing</a></li>
+                <li>
+                  <a
+                    href={PORTAL_URL}
+                    onClick={() => track('portal_signin', { from: 'footer' })}
+                    className="hover:text-gold-400 transition"
+                  >
+                    Church sign in
+                  </a>
+                </li>
                 <li><a href="#" className="hover:text-gold-400 transition">Security</a></li>
               </ul>
             </div>
@@ -625,13 +657,13 @@ export default function Home() {
               <ul className="space-y-2 text-sm">
                 <li><a href="#" className="hover:text-gold-400 transition">About</a></li>
                 <li><a href="#" className="hover:text-gold-400 transition">Blog</a></li>
-                <li><a href="#" className="hover:text-gold-400 transition">Contact</a></li>
+                <li><a href="mailto:support@church-day.com" className="hover:text-gold-400 transition">Contact</a></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold text-white mb-4">Legal</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-gold-400 transition">Privacy</a></li>
+                <li><a href="/privacy" className="hover:text-gold-400 transition">Privacy</a></li>
                 <li><a href="#" className="hover:text-gold-400 transition">Terms</a></li>
               </ul>
             </div>
