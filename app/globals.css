@@ -25,6 +25,11 @@ body {
 .gradient-hero {
   background: linear-gradient(180deg, #3a6a8f 0%, #2c4d6f 30%, #1f3448 70%, #142535 100%);
   position: relative;
+  /* The ::before glow is a fixed 500px circle centred on the section. Below a
+     500px viewport it hangs past both edges, and the right-hand overhang gives
+     the whole page a horizontal scroll (63px of it at 375px). Clip it here —
+     the section is full-bleed, so nothing inside needs to escape. */
+  overflow: hidden;
 }
 
 .gradient-hero::before {
@@ -55,6 +60,76 @@ body {
 
 .btn-secondary {
   @apply px-6 py-3 border-2 border-gold-500 text-gold-500 rounded-lg font-semibold hover:bg-gold-500/10 transition-all duration-300;
+}
+
+/* --- /for-pastors: the document-viewer page ---------------------------- */
+
+/* Paper sheets sit on a dark ground, so the browser's own overscroll and the
+   scroll-into-view offset both have to know about the fixed viewer chrome. */
+.doc-ground {
+  background-color: #0e1b26;
+  background-image: radial-gradient(
+    ellipse 90% 60% at 50% 0%,
+    rgba(44, 77, 111, 0.55) 0%,
+    rgba(14, 27, 38, 0) 70%
+  );
+  background-attachment: fixed;
+}
+
+/* Chapters reveal as they enter the viewport, once. */
+.doc-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s ease-out, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.doc-reveal[data-shown='true'] {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .doc-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* "Save as PDF" is the browser's own print dialog, so the sheets have to
+   survive it: no viewer chrome, no dark ground, every panel open. */
+@media print {
+  .doc-ground {
+    background: #ffffff;
+  }
+
+  .doc-no-print {
+    display: none !important;
+  }
+
+  .doc-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .doc-sheet {
+    box-shadow: none !important;
+    border: 1px solid #e7e2d9;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin: 0 0 16px !important;
+  }
+
+  /* Answers that slide over their card on screen have to sit under it on paper. */
+  .doc-answer {
+    position: static !important;
+    transform: none !important;
+    margin-top: 16px;
+  }
 }
 
 .scrollbar-hide {

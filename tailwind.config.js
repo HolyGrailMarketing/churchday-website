@@ -58,6 +58,8 @@ module.exports = {
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
+        // Reading face used by /for-pastors; falls back to a system serif.
+        display: ['var(--font-display)', 'Georgia', 'Cambria', 'serif'],
       },
       animation: {
         'fade-in': 'fadeIn 0.6s ease-in',
