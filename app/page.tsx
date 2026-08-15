@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { track } from '@vercel/analytics'
 import Image from 'next/image'
+import Link from 'next/link'
 import { Menu, X, ArrowRight, ArrowLeft, CheckCircle2, Users, Calendar, Clock, BarChart3, MessageSquare, Zap, Layers, Database, HandCoins, TrendingUp, Smartphone, PartyPopper } from 'lucide-react'
 
 const APP_STORE_URL = 'https://apps.apple.com/us/app/churchday/id6765494714'
@@ -41,9 +42,40 @@ export default function Home() {
   // iOS ships on the App Store; Android is still pre-launch.
   const [downloadModal, setDownloadModal] = useState<'android' | null>(null)
 
+  // Android closed-test signup
+  const [testerForm, setTesterForm] = useState({ email: '', name: '', church: '' })
+  const [testerSubmitting, setTesterSubmitting] = useState(false)
+  const [testerDone, setTesterDone] = useState(false)
+  const [testerError, setTesterError] = useState('')
+
   const openDownload = (platform: 'android') => {
     track('android_waitlist_opened', { platform })
+    setTesterDone(false)
+    setTesterError('')
+    setTesterForm({ email: '', name: '', church: '' })
     setDownloadModal(platform)
+  }
+
+  const handleTesterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setTesterSubmitting(true)
+    setTesterError('')
+    try {
+      const res = await fetch('/api/android-tester', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(testerForm),
+      })
+      if (!res.ok) throw new Error('failed')
+      // No email here — Vercel Analytics is cookieless and stays free of personal data.
+      track('android_tester_signup', { gaveChurch: Boolean(testerForm.church) })
+      setTesterDone(true)
+    } catch {
+      track('android_tester_failed')
+      setTesterError('That did not go through. Please try again, or email demos@church-day.com.')
+    } finally {
+      setTesterSubmitting(false)
+    }
   }
 
   // Schedule-a-demo wizard
@@ -115,6 +147,13 @@ export default function Home() {
               <a href="#features" className="text-white/70 hover:text-gold-400 transition">Features</a>
               <a href="#pricing" className="text-white/70 hover:text-gold-400 transition">Pricing</a>
               <a href="#how-it-works" className="text-white/70 hover:text-gold-400 transition">How It Works</a>
+              <Link
+                href="/for-pastors"
+                onClick={() => track('pastors_brief_opened', { source: 'nav' })}
+                className="text-white/70 hover:text-gold-400 transition"
+              >
+                For Pastors
+              </Link>
               <a
                 href={PORTAL_URL}
                 onClick={() => track('portal_signin', { from: 'nav' })}
@@ -139,6 +178,16 @@ export default function Home() {
               <a href="#features" className="block py-2 text-white/70 hover:text-gold-400">Features</a>
               <a href="#pricing" className="block py-2 text-white/70 hover:text-gold-400">Pricing</a>
               <a href="#how-it-works" className="block py-2 text-white/70 hover:text-gold-400">How It Works</a>
+              <Link
+                href="/for-pastors"
+                onClick={() => {
+                  setMobileMenuOpen(false)
+                  track('pastors_brief_opened', { source: 'mobile_nav' })
+                }}
+                className="block py-2 text-white/70 hover:text-gold-400"
+              >
+                For Pastors
+              </Link>
               <a
                 href={PORTAL_URL}
                 onClick={() => {
@@ -166,6 +215,7 @@ export default function Home() {
                 alt="ChurchDay"
                 width={80}
                 height={80}
+                priority
                 className="mx-auto relative z-10 drop-shadow-2xl"
               />
             </div>
@@ -201,6 +251,20 @@ export default function Home() {
             >
               Set up your church
             </a>
+          </div>
+
+          {/* Deliberately quiet: the demo request is the conversion, so the brief
+              sits underneath the buttons as an option rather than competing with
+              them. `source` lets us compare it against the CTAs above later. */}
+          <div className="mt-6 animate-slide-up">
+            <Link
+              href="/for-pastors"
+              onClick={() => track('pastors_brief_opened', { source: 'hero' })}
+              className="inline-flex items-center gap-1.5 text-sm text-white/50 underline-offset-4 transition hover:text-gold-400 hover:underline"
+            >
+              Or read the five-minute brief
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
 
           {/* App Store Badges */}
@@ -362,19 +426,19 @@ export default function Home() {
 
           <div className="flex gap-5 overflow-x-auto pb-6 snap-x snap-mandatory scrollbar-hide -mx-4 px-4">
             {[
-              { src: '/IMG_5686.PNG', label: 'Home' },
-              { src: '/daily inspiration.PNG', label: 'Daily Inspiration' },
-              { src: '/ministries.PNG', label: 'Ministries' },
-              { src: '/create event.PNG', label: 'Create Event' },
-              { src: '/find-church.PNG', label: 'Find Church' },
-              { src: '/login.PNG', label: 'Login' },
-              { src: '/settings.PNG', label: 'Settings' },
+              { src: '/IMG_5686.PNG', label: 'Home', alt: "ChurchDay Home screen showing today's devotional and quick access to the admin panel" },
+              { src: '/daily inspiration.PNG', label: 'Daily Inspiration', alt: 'ChurchDay Daily Inspiration screen with a scripture-based devotional and prayer prompt' },
+              { src: '/ministries.PNG', label: 'Ministries', alt: 'ChurchDay Ministries screen listing church ministry groups and teams' },
+              { src: '/create event.PNG', label: 'Create Event', alt: 'ChurchDay Create Event screen for scheduling a church service or activity' },
+              { src: '/find-church.PNG', label: 'Find Church', alt: 'ChurchDay Find Church screen for a member to search and join their congregation' },
+              { src: '/login.PNG', label: 'Login', alt: 'ChurchDay sign-in screen' },
+              { src: '/settings.PNG', label: 'Settings', alt: 'ChurchDay Settings screen for managing account and church preferences' },
             ].map((screenshot, i) => (
               <div key={i} className="flex-shrink-0 snap-center flex flex-col items-center gap-3">
                 <div className="w-[200px] rounded-[24px] overflow-hidden shadow-lg border-[6px] border-primary-900 bg-primary-900">
                   <Image
                     src={screenshot.src}
-                    alt={screenshot.label}
+                    alt={screenshot.alt}
                     width={200}
                     height={433}
                     className="w-full h-auto"
@@ -628,6 +692,7 @@ export default function Home() {
               <ul className="space-y-2 text-sm">
                 <li><a href="#features" className="hover:text-gold-400 transition">Features</a></li>
                 <li><a href="#pricing" className="hover:text-gold-400 transition">Pricing</a></li>
+                <li><Link href="/for-pastors" className="hover:text-gold-400 transition">For Pastors</Link></li>
                 <li>
                   <a
                     href={PORTAL_URL}
@@ -637,14 +702,11 @@ export default function Home() {
                     Church sign in
                   </a>
                 </li>
-                <li><a href="#" className="hover:text-gold-400 transition">Security</a></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold text-white mb-4">Company</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-gold-400 transition">About</a></li>
-                <li><a href="#" className="hover:text-gold-400 transition">Blog</a></li>
                 <li><a href="mailto:support@church-day.com" className="hover:text-gold-400 transition">Contact</a></li>
               </ul>
             </div>
@@ -652,7 +714,7 @@ export default function Home() {
               <h4 className="font-semibold text-white mb-4">Legal</h4>
               <ul className="space-y-2 text-sm">
                 <li><a href="/privacy" className="hover:text-gold-400 transition">Privacy</a></li>
-                <li><a href="#" className="hover:text-gold-400 transition">Terms</a></li>
+                <li><a href="/delete-account" className="hover:text-gold-400 transition">Delete your account</a></li>
               </ul>
             </div>
           </div>
@@ -690,44 +752,87 @@ export default function Home() {
                 </div>
               </div>
 
-              <h2 className="text-3xl font-bold text-primary-900 mb-3">
-                Get ChurchDay on Android
-              </h2>
-              <p className="text-gold-600 font-semibold mb-2">Coming Soon to Google Play</p>
-              <p className="text-sm text-primary-500 mb-8">
-                Be notified when ChurchDay launches. Join thousands of church leaders ready to Connect, Worship, and Grow.
-              </p>
+              {testerDone ? (
+                <>
+                  <h2 className="text-3xl font-bold text-primary-900 mb-3">You&apos;re on the list</h2>
+                  <p className="text-sm text-primary-500 mb-6">
+                    We&apos;ll add your Google account to the test and email you a link to accept the
+                    invitation. Check your inbox for a confirmation now.
+                  </p>
+                  <button
+                    onClick={() => setDownloadModal(null)}
+                    className="block w-full px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold transition hover:shadow-lg hover:shadow-gold-500/25"
+                  >
+                    Done
+                  </button>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-3xl font-bold text-primary-900 mb-3">
+                    Test ChurchDay on Android
+                  </h2>
+                  <p className="text-gold-600 font-semibold mb-2">Closed test on Google Play</p>
+                  <p className="text-sm text-primary-500 mb-6">
+                    ChurchDay is in closed testing on Android. Add your Google account and we&apos;ll send
+                    you an invitation to install it.
+                  </p>
 
-              {/* Features list */}
-              <div className="bg-primary-50 rounded-lg p-6 mb-6 text-left">
-                <ul className="space-y-3">
-                  <li className="flex gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-sm text-primary-700">Offline support</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-sm text-primary-700">Fast performance</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-sm text-primary-700">Device optimization</span>
-                  </li>
-                </ul>
-              </div>
+                  <form onSubmit={handleTesterSubmit} className="text-left space-y-3">
+                    <div>
+                      <label htmlFor="tester-email" className="block text-sm font-medium text-primary-800 mb-1">
+                        Google account email
+                      </label>
+                      <input
+                        id="tester-email"
+                        type="email"
+                        required
+                        value={testerForm.email}
+                        onChange={(e) => setTesterForm({ ...testerForm, email: e.target.value })}
+                        placeholder="you@gmail.com"
+                        className="w-full px-4 py-3 rounded-lg border border-primary-200 text-primary-900 placeholder-gray-400 outline-none transition focus:border-gold-500"
+                      />
+                      {/* Play matches testers by Google account, so a work address
+                          that isn't signed in on the phone will never get the invite. */}
+                      <p className="mt-1.5 text-xs text-primary-500">
+                        Use the Google account you&apos;re signed into on your Android phone, or the
+                        invitation won&apos;t reach you.
+                      </p>
+                    </div>
 
-              <button
-                onClick={() => {
-                  setDownloadModal(null)
-                  setTimeout(() => openSchedule('android_waitlist'), 300)
-                }}
-                className="block w-full px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold hover:shadow-lg hover:shadow-gold-500/25 transition-all duration-300 transform hover:-translate-y-1 mb-3"
-              >
-                Notify Me
-              </button>
-              <p className="text-xs text-primary-500">
-                In active development — we&apos;ll email you the moment it&apos;s live.
-              </p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <input
+                        type="text"
+                        value={testerForm.name}
+                        onChange={(e) => setTesterForm({ ...testerForm, name: e.target.value })}
+                        placeholder="Your name"
+                        aria-label="Your name, optional"
+                        className="w-full px-4 py-3 rounded-lg border border-primary-200 text-primary-900 placeholder-gray-400 outline-none transition focus:border-gold-500"
+                      />
+                      <input
+                        type="text"
+                        value={testerForm.church}
+                        onChange={(e) => setTesterForm({ ...testerForm, church: e.target.value })}
+                        placeholder="Church"
+                        aria-label="Church name, optional"
+                        className="w-full px-4 py-3 rounded-lg border border-primary-200 text-primary-900 placeholder-gray-400 outline-none transition focus:border-gold-500"
+                      />
+                    </div>
+
+                    {testerError && <p className="text-sm text-red-600">{testerError}</p>}
+
+                    <button
+                      type="submit"
+                      disabled={testerSubmitting}
+                      className="block w-full px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold transition hover:shadow-lg hover:shadow-gold-500/25 disabled:opacity-60"
+                    >
+                      {testerSubmitting ? 'Sending…' : 'Join the test'}
+                    </button>
+                    <p className="text-xs text-primary-500 text-center">
+                      Places are limited while we test. Name and church are optional.
+                    </p>
+                  </form>
+                </>
+              )}
             </div>
           </div>
         </div>

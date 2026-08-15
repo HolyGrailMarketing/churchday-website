@@ -6,6 +6,12 @@ import Link from 'next/link'
 export const metadata: Metadata = {
   title: 'Privacy Policy — ChurchDay',
   description: 'Privacy Policy for the ChurchDay church management app.',
+  alternates: {
+    canonical: '/privacy',
+  },
+  // A privacy policy has no business competing for search traffic — keeping
+  // it out of the index concentrates crawl budget on pages that matter.
+  robots: { index: false, follow: true },
 }
 
 export default function PrivacyPolicy() {
@@ -94,9 +100,16 @@ export default function PrivacyPolicy() {
 
           <section>
             <h2 className="text-xl font-semibold text-primary-800 mb-3">5. Data Retention</h2>
-            <p>We retain your account data for as long as your account is active. You may request deletion of
-              your account and associated data by contacting us at the email below. Donation records may be
-              retained as required by law.</p>
+            <p>We retain your account data for as long as your account is active. You may delete your account
+              from the Profile screen in the App, or request deletion of your account and associated data by
+              contacting us at the email below. Donation records may be retained as required by law.</p>
+            <p className="mt-3">
+              For step-by-step instructions, and a full list of what is deleted, what is kept and for how long,
+              see{' '}
+              <Link href="/delete-account" className="text-primary-600 underline">
+                Delete Your Account
+              </Link>.
+            </p>
           </section>
 
           <section>
