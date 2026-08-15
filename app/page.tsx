@@ -4,14 +4,14 @@ import { useState } from 'react'
 import { track } from '@vercel/analytics'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Menu, X, ArrowRight, ArrowLeft, CheckCircle2, Users, Calendar, Clock, BarChart3, MessageSquare, Zap, Layers, Database, HandCoins, TrendingUp, Smartphone, PartyPopper } from 'lucide-react'
-
-const APP_STORE_URL = 'https://apps.apple.com/us/app/churchday/id6765494714'
-
-// The church management portal (Flutter web, deployed separately).
-const PORTAL_URL = 'https://app.church-day.com'
-// `?signup=1` opens the portal on its Sign Up tab rather than Sign In.
-const PORTAL_SIGNUP_URL = `${PORTAL_URL}/?signup=1`
+import { ArrowRight, ArrowLeft, CheckCircle2, Calendar, Clock, Database, HandCoins, TrendingUp, PartyPopper, X } from 'lucide-react'
+import { APP_STORE_URL, PORTAL_SIGNUP_URL } from '@/lib/constants'
+import { Nav } from '@/components/Nav'
+import { Footer } from '@/components/Footer'
+import { FeatureGrid } from '@/components/FeatureGrid'
+import { PricingSection } from '@/components/PricingSection'
+import { useAndroidWaitlist } from '@/components/AndroidWaitlistModal'
+import { DENOMINATION_SLUGS, denominations } from '@/data/denominations'
 
 const TIME_SLOTS = ['9:00 AM', '11:00 AM', '2:00 PM', '4:00 PM']
 
@@ -35,48 +35,10 @@ function getUpcomingDays() {
 }
 
 export default function Home() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { openWaitlist } = useAndroidWaitlist()
   const [demoForm, setDemoForm] = useState({ name: '', email: '', church: '', phone: '' })
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
-  // iOS ships on the App Store; Android is still pre-launch.
-  const [downloadModal, setDownloadModal] = useState<'android' | null>(null)
-
-  // Android closed-test signup
-  const [testerForm, setTesterForm] = useState({ email: '', name: '', church: '' })
-  const [testerSubmitting, setTesterSubmitting] = useState(false)
-  const [testerDone, setTesterDone] = useState(false)
-  const [testerError, setTesterError] = useState('')
-
-  const openDownload = (platform: 'android') => {
-    track('android_waitlist_opened', { platform })
-    setTesterDone(false)
-    setTesterError('')
-    setTesterForm({ email: '', name: '', church: '' })
-    setDownloadModal(platform)
-  }
-
-  const handleTesterSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setTesterSubmitting(true)
-    setTesterError('')
-    try {
-      const res = await fetch('/api/android-tester', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(testerForm),
-      })
-      if (!res.ok) throw new Error('failed')
-      // No email here — Vercel Analytics is cookieless and stays free of personal data.
-      track('android_tester_signup', { gaveChurch: Boolean(testerForm.church) })
-      setTesterDone(true)
-    } catch {
-      track('android_tester_failed')
-      setTesterError('That did not go through. Please try again, or email demos@church-day.com.')
-    } finally {
-      setTesterSubmitting(false)
-    }
-  }
 
   // Schedule-a-demo wizard
   const [scheduleOpen, setScheduleOpen] = useState(false)
@@ -133,75 +95,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      {/* Navigation */}
-      <nav className="fixed w-full bg-primary-900/90 backdrop-blur-md z-50 border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-2">
-              <Image src="/logo.png" alt="ChurchDay" width={32} height={32} className="rounded-lg" />
-              <span className="font-bold text-lg text-gold-400">ChurchDay</span>
-            </div>
-
-            {/* Desktop Menu */}
-            <div className="hidden md:flex gap-8 items-center">
-              <a href="#features" className="text-white/70 hover:text-gold-400 transition">Features</a>
-              <a href="#pricing" className="text-white/70 hover:text-gold-400 transition">Pricing</a>
-              <a href="#how-it-works" className="text-white/70 hover:text-gold-400 transition">How It Works</a>
-              <Link
-                href="/for-pastors"
-                onClick={() => track('pastors_brief_opened', { source: 'nav' })}
-                className="text-white/70 hover:text-gold-400 transition"
-              >
-                For Pastors
-              </Link>
-              <a
-                href={PORTAL_URL}
-                onClick={() => track('portal_signin', { from: 'nav' })}
-                className="btn-primary"
-              >
-                Church sign in
-              </a>
-            </div>
-
-            {/* Mobile Menu Button */}
-            <button
-              className="md:hidden text-white/80"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? <X /> : <Menu />}
-            </button>
-          </div>
-
-          {/* Mobile Menu */}
-          {mobileMenuOpen && (
-            <div className="md:hidden pb-4 border-t border-white/10">
-              <a href="#features" className="block py-2 text-white/70 hover:text-gold-400">Features</a>
-              <a href="#pricing" className="block py-2 text-white/70 hover:text-gold-400">Pricing</a>
-              <a href="#how-it-works" className="block py-2 text-white/70 hover:text-gold-400">How It Works</a>
-              <Link
-                href="/for-pastors"
-                onClick={() => {
-                  setMobileMenuOpen(false)
-                  track('pastors_brief_opened', { source: 'mobile_nav' })
-                }}
-                className="block py-2 text-white/70 hover:text-gold-400"
-              >
-                For Pastors
-              </Link>
-              <a
-                href={PORTAL_URL}
-                onClick={() => {
-                  setMobileMenuOpen(false)
-                  track('portal_signin', { from: 'mobile_nav' })
-                }}
-                className="btn-primary block w-full mt-2 text-center"
-              >
-                Church sign in
-              </a>
-            </div>
-          )}
-        </div>
-      </nav>
+      <Nav />
 
       {/* Hero Section - Matching App Splash Screen */}
       <section className="gradient-hero min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -267,6 +161,24 @@ export default function Home() {
             </Link>
           </div>
 
+          {/* Same quiet treatment as the brief link above — denomination
+              pages are for outreach, not a headline feature. */}
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1 animate-slide-up">
+            <span className="text-xs text-white/30">Built for</span>
+            {DENOMINATION_SLUGS.map((slug, i) => (
+              <span key={slug} className="text-xs text-white/30">
+                <Link
+                  href={`/for/${slug}`}
+                  onClick={() => track('denomination_page_opened', { source: 'hero', denomination: slug })}
+                  className="text-white/50 underline-offset-4 transition hover:text-gold-400 hover:underline"
+                >
+                  {denominations[slug].shortName}
+                </Link>
+                {i < DENOMINATION_SLUGS.length - 1 ? ',' : '.'}
+              </span>
+            ))}
+          </div>
+
           {/* App Store Badges */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-10 animate-slide-up">
             <a
@@ -288,7 +200,7 @@ export default function Home() {
               </svg>
             </a>
             <button
-              onClick={() => openDownload('android')}
+              onClick={openWaitlist}
               className="inline-block hover:opacity-80 hover:scale-105 transition-all duration-300 cursor-pointer"
             >
               <svg width="168" height="50" viewBox="0 0 168 50" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -347,67 +259,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="inline-block px-4 py-1 border border-gold-300 text-gold-600 rounded-full text-xs font-medium mb-4">
-              Features
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-primary-900 mb-4">
-              Powerful Features Built for Church Leaders
-            </h2>
-            <p className="text-lg text-primary-700/70">
-              Everything you need to manage and grow your church in one platform
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-            {[
-              {
-                icon: <Users className="w-6 h-6 text-gold-600" />,
-                title: "Member Management",
-                description: "Centralize all member information, roles, contact details, and engagement history in one place"
-              },
-              {
-                icon: <Calendar className="w-6 h-6 text-gold-600" />,
-                title: "Event Planning",
-                description: "Create, schedule, and manage church events, services, and activities with ease"
-              },
-              {
-                icon: <BarChart3 className="w-6 h-6 text-gold-600" />,
-                title: "Attendance Tracking",
-                description: "Track attendance automatically with check-in system and gain insights into member engagement"
-              },
-              {
-                icon: <MessageSquare className="w-6 h-6 text-gold-600" />,
-                title: "Communications Hub",
-                description: "Send announcements, prayer requests, and updates to your entire church community instantly"
-              },
-              {
-                icon: <Zap className="w-6 h-6 text-gold-600" />,
-                title: "Donation Management",
-                description: "Manage online giving, track contributions, and generate financial reports effortlessly"
-              },
-              {
-                icon: <Layers className="w-6 h-6 text-gold-600" />,
-                title: "Ministry Groups",
-                description: "Organize and coordinate ministry teams (choir, youth, women's, men's groups, etc.)"
-              }
-            ].map((feature, i) => (
-              <div key={i} className="flex gap-4 p-6 rounded-xl hover:bg-primary-50/50 transition-all">
-                <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary-900 flex items-center justify-center">
-                  {feature.icon}
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-primary-900 mb-2">{feature.title}</h3>
-                  <p className="text-primary-700/70">{feature.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <FeatureGrid />
 
       {/* Screenshots Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-[#fbfaf8] overflow-hidden">
@@ -510,333 +362,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="inline-block px-4 py-1 border border-gold-300 text-gold-600 rounded-full text-xs font-medium mb-4">
-              Pricing
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-primary-900 mb-4">
-              Simple, Transparent Pricing
-            </h2>
-            <p className="text-lg text-primary-700/70 max-w-2xl mx-auto">
-              Choose the plan that fits your congregation. All plans include a 14-day free trial.
-            </p>
-          </div>
+      <PricingSection />
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                name: "Starter",
-                price: "4,500",
-                description: "For small churches getting started",
-                members: "Up to 100 members",
-                features: [
-                  "Member management",
-                  "Attendance tracking",
-                  "Event calendar",
-                  "Announcements",
-                  "Prayer requests",
-                  "Basic reports",
-                ],
-                highlighted: false,
-              },
-              {
-                name: "Growth",
-                price: "8,500",
-                description: "For growing congregations",
-                members: "Up to 500 members",
-                features: [
-                  "Everything in Starter",
-                  "Online tithes & offerings",
-                  "Ministry group management",
-                  "Advanced analytics",
-                  "Communication hub",
-                  "Donation reports",
-                  "Multiple admin roles",
-                ],
-                highlighted: true,
-              },
-              {
-                name: "Pro",
-                price: "12,500",
-                description: "For established churches",
-                members: "Unlimited members",
-                features: [
-                  "Everything in Growth",
-                  "Priority support",
-                  "Custom branding",
-                  "Advanced financial reports",
-                  "Bulk member import",
-                  "API access",
-                  "Dedicated account manager",
-                ],
-                highlighted: false,
-              },
-            ].map((plan, i) => (
-              <div
-                key={i}
-                className={`p-8 rounded-2xl border-2 transition-all ${
-                  plan.highlighted
-                    ? "border-gold-400 bg-primary-900 shadow-2xl shadow-gold-500/10 relative"
-                    : "border-primary-100 bg-white hover:border-gold-300"
-                }`}
-              >
-                {plan.highlighted && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <span className="px-4 py-1 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 text-sm font-bold rounded-full">
-                      Most Popular
-                    </span>
-                  </div>
-                )}
-                <h3 className={`text-xl font-bold mb-1 ${plan.highlighted ? "text-gold-400" : "text-primary-900"}`}>
-                  {plan.name}
-                </h3>
-                <p className={`text-sm mb-6 ${plan.highlighted ? "text-white/60" : "text-primary-700/70"}`}>
-                  {plan.description}
-                </p>
-                <div className="mb-6">
-                  <span className={`text-4xl font-bold ${plan.highlighted ? "text-white" : "text-primary-900"}`}>
-                    ${plan.price}
-                  </span>
-                  <span className={`text-sm ${plan.highlighted ? "text-white/60" : "text-primary-700/70"}`}>
-                    {" "}JMD/month
-                  </span>
-                </div>
-                <p className={`text-sm font-medium mb-6 pb-6 border-b ${
-                  plan.highlighted ? "text-gold-400 border-white/10" : "text-primary-600 border-primary-100"
-                }`}>
-                  {plan.members}
-                </p>
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((feature, j) => (
-                    <li key={j} className="flex gap-2 items-start">
-                      <CheckCircle2 className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
-                        plan.highlighted ? "text-gold-400" : "text-gold-500"
-                      }`} />
-                      <span className={`text-sm ${plan.highlighted ? "text-white/80" : "text-primary-700"}`}>
-                        {feature}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                <a
-                  href={PORTAL_SIGNUP_URL}
-                  onClick={() =>
-                    track('portal_signup', { from: `pricing_${plan.name.toLowerCase()}` })
-                  }
-                  className={`block w-full py-3 rounded-lg font-semibold text-center transition-all duration-300 ${
-                    plan.highlighted
-                      ? "bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 hover:shadow-lg hover:shadow-gold-500/25"
-                      : "border-2 border-primary-900 text-primary-900 hover:bg-primary-900 hover:text-white"
-                  }`}
-                >
-                  Get Started
-                </a>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-primary-900 text-white/60 py-12 px-4 sm:px-6 lg:px-8 border-t border-white/5">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Image src="/logo.png" alt="ChurchDay" width={32} height={32} className="rounded-lg" />
-                <span className="font-bold text-gold-400">ChurchDay</span>
-              </div>
-              <p className="text-sm text-white/40 mb-4">Connect. Worship. Grow.</p>
-              <div className="flex flex-col gap-3">
-                <a
-                  href={APP_STORE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Download ChurchDay on the App Store"
-                  onClick={() => track('app_store_click', { placement: 'footer' })}
-                  className="inline-block hover:opacity-80 hover:scale-105 transition-all duration-300 cursor-pointer"
-                >
-                  <svg width="120" height="40" viewBox="0 0 150 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="150" height="50" rx="10" fill="black"/>
-                    <text x="52" y="17" fill="white" fontSize="8" fontFamily="system-ui" fontWeight="400">Download on the</text>
-                    <text x="52" y="33" fill="white" fontSize="16" fontFamily="system-ui" fontWeight="600">App Store</text>
-                    <g transform="translate(14, 8) scale(0.7)">
-                      <path d="M24.769 20.3a5.68 5.68 0 0 1 2.706-4.77 5.823 5.823 0 0 0-4.59-2.483c-1.93-.203-3.81 1.157-4.797 1.157-.999 0-2.503-1.137-4.12-1.104a6.076 6.076 0 0 0-5.115 3.118c-2.21 3.832-.563 9.466 1.56 12.564 1.062 1.52 2.3 3.22 3.916 3.16 1.582-.066 2.174-1.012 4.084-1.012 1.9 0 2.458 1.012 4.104.975 1.697-.028 2.77-1.526 3.793-3.06a12.575 12.575 0 0 0 1.736-3.539 5.49 5.49 0 0 1-3.277-5.006z" fill="white"/>
-                      <path d="M21.607 11.13a5.593 5.593 0 0 0 1.28-4.01 5.7 5.7 0 0 0-3.687 1.907 5.327 5.327 0 0 0-1.313 3.862 4.71 4.71 0 0 0 3.72-1.76z" fill="white"/>
-                    </g>
-                  </svg>
-                </a>
-                <button
-                  onClick={() => openDownload('android')}
-                  className="inline-block hover:opacity-80 hover:scale-105 transition-all duration-300 cursor-pointer"
-                >
-                  <svg width="135" height="40" viewBox="0 0 168 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="168" height="50" rx="10" fill="black"/>
-                    <text x="62" y="17" fill="white" fontSize="8" fontFamily="system-ui" fontWeight="400">GET IT ON</text>
-                    <text x="62" y="34" fill="white" fontSize="15" fontFamily="system-ui" fontWeight="600">Google Play</text>
-                    <g transform="translate(14, 10) scale(0.65)">
-                      <path d="M4.4 2.1L24.3 13.4c.5.3.8.8.8 1.4v22.4c0 .6-.3 1.1-.8 1.4L4.4 49.9c-.8.5-1.8-.1-1.8-1V3.1c0-.9 1-1.5 1.8-1z" fill="#4285F4"/>
-                      <path d="M4.4 2.1L24.3 13.4l7.2-7.5L5.6.7C4.8.2 3.6.7 3.6 1.6v.1c0 .2.3.3.8.4z" fill="#EA4335"/>
-                      <path d="M31.5 5.9L24.3 13.4 4.4 2.1C3.6 1.6 2.6 2.2 2.6 3.1v45.8c0 .9 1 1.5 1.8 1L24.3 38.6l7.2 7.5c.5.5 1.3.1 1.3-.5V6.4c0-.6-.8-1-1.3-.5z" fill="#34A853"/>
-                      <path d="M24.3 38.6L4.4 49.9c-.8.5-1.8-.1-1.8-1V48.8c0 .2.3.3.8.4L31.5 46.1l-7.2-7.5z" fill="#FBBC05"/>
-                    </g>
-                  </svg>
-                </button>
-              </div>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Product</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#features" className="hover:text-gold-400 transition">Features</a></li>
-                <li><a href="#pricing" className="hover:text-gold-400 transition">Pricing</a></li>
-                <li><Link href="/for-pastors" className="hover:text-gold-400 transition">For Pastors</Link></li>
-                <li>
-                  <a
-                    href={PORTAL_URL}
-                    onClick={() => track('portal_signin', { from: 'footer' })}
-                    className="hover:text-gold-400 transition"
-                  >
-                    Church sign in
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Company</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="mailto:support@church-day.com" className="hover:text-gold-400 transition">Contact</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="/privacy" className="hover:text-gold-400 transition">Privacy</a></li>
-                <li><a href="/delete-account" className="hover:text-gold-400 transition">Delete your account</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-white/10 pt-8 text-center text-sm text-white/40">
-            <p>&copy; 2026 ChurchDay. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
-
-      {/* Download Modal */}
-      {downloadModal && (
-        <div
-          onClick={() => setDownloadModal(null)}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in"
-        >
-          <div onClick={(e) => e.stopPropagation()} className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-slide-up">
-            {/* Background decoration */}
-            <div className="absolute top-0 right-0 w-40 h-40 bg-gold-100 rounded-full -mr-20 -mt-20 opacity-30" />
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary-100 rounded-full -ml-16 -mb-16 opacity-20" />
-
-            {/* Close button */}
-            <button
-              onClick={() => setDownloadModal(null)}
-              className="absolute top-4 right-4 z-20 p-2 hover:bg-primary-100 rounded-full transition"
-            >
-              <X className="w-6 h-6 text-primary-900" />
-            </button>
-
-            {/* Content */}
-            <div className="relative z-10 p-8 text-center">
-              {/* Android — pre-launch, Google Play */}
-              <div className="mb-6 inline-block">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-gold-400 to-gold-500 flex items-center justify-center shadow-lg">
-                  <Smartphone className="w-10 h-10 text-white" />
-                </div>
-              </div>
-
-              {testerDone ? (
-                <>
-                  <h2 className="text-3xl font-bold text-primary-900 mb-3">You&apos;re on the list</h2>
-                  <p className="text-sm text-primary-500 mb-6">
-                    We&apos;ll add your Google account to the test and email you a link to accept the
-                    invitation. Check your inbox for a confirmation now.
-                  </p>
-                  <button
-                    onClick={() => setDownloadModal(null)}
-                    className="block w-full px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold transition hover:shadow-lg hover:shadow-gold-500/25"
-                  >
-                    Done
-                  </button>
-                </>
-              ) : (
-                <>
-                  <h2 className="text-3xl font-bold text-primary-900 mb-3">
-                    Test ChurchDay on Android
-                  </h2>
-                  <p className="text-gold-600 font-semibold mb-2">Closed test on Google Play</p>
-                  <p className="text-sm text-primary-500 mb-6">
-                    ChurchDay is in closed testing on Android. Add your Google account and we&apos;ll send
-                    you an invitation to install it.
-                  </p>
-
-                  <form onSubmit={handleTesterSubmit} className="text-left space-y-3">
-                    <div>
-                      <label htmlFor="tester-email" className="block text-sm font-medium text-primary-800 mb-1">
-                        Google account email
-                      </label>
-                      <input
-                        id="tester-email"
-                        type="email"
-                        required
-                        value={testerForm.email}
-                        onChange={(e) => setTesterForm({ ...testerForm, email: e.target.value })}
-                        placeholder="you@gmail.com"
-                        className="w-full px-4 py-3 rounded-lg border border-primary-200 text-primary-900 placeholder-gray-400 outline-none transition focus:border-gold-500"
-                      />
-                      {/* Play matches testers by Google account, so a work address
-                          that isn't signed in on the phone will never get the invite. */}
-                      <p className="mt-1.5 text-xs text-primary-500">
-                        Use the Google account you&apos;re signed into on your Android phone, or the
-                        invitation won&apos;t reach you.
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <input
-                        type="text"
-                        value={testerForm.name}
-                        onChange={(e) => setTesterForm({ ...testerForm, name: e.target.value })}
-                        placeholder="Your name"
-                        aria-label="Your name, optional"
-                        className="w-full px-4 py-3 rounded-lg border border-primary-200 text-primary-900 placeholder-gray-400 outline-none transition focus:border-gold-500"
-                      />
-                      <input
-                        type="text"
-                        value={testerForm.church}
-                        onChange={(e) => setTesterForm({ ...testerForm, church: e.target.value })}
-                        placeholder="Church"
-                        aria-label="Church name, optional"
-                        className="w-full px-4 py-3 rounded-lg border border-primary-200 text-primary-900 placeholder-gray-400 outline-none transition focus:border-gold-500"
-                      />
-                    </div>
-
-                    {testerError && <p className="text-sm text-red-600">{testerError}</p>}
-
-                    <button
-                      type="submit"
-                      disabled={testerSubmitting}
-                      className="block w-full px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold transition hover:shadow-lg hover:shadow-gold-500/25 disabled:opacity-60"
-                    >
-                      {testerSubmitting ? 'Sending…' : 'Join the test'}
-                    </button>
-                    <p className="text-xs text-primary-500 text-center">
-                      Places are limited while we test. Name and church are optional.
-                    </p>
-                  </form>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <Footer />
 
       {/* Schedule a Demo Wizard */}
       {scheduleOpen && (

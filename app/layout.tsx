@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { AndroidWaitlistProvider } from '@/components/AndroidWaitlistModal'
 import './globals.css'
 
 // www is the canonical host — church-day.com already 301s here at the Vercel
@@ -136,7 +137,7 @@ export default function RootLayout({
   return (
     <html lang="en-JM">
       <body className="antialiased bg-stone-50">
-        {children}
+        <AndroidWaitlistProvider>{children}</AndroidWaitlistProvider>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next'
+import { DENOMINATION_SLUGS } from '@/data/denominations'
 
 const SITE_URL = 'https://www.church-day.com'
 
@@ -10,5 +11,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: SITE_URL, lastModified, changeFrequency: 'weekly', priority: 1 },
     { url: `${SITE_URL}/for-pastors`, lastModified, changeFrequency: 'monthly', priority: 0.9 },
+    ...DENOMINATION_SLUGS.map((slug) => ({
+      url: `${SITE_URL}/for/${slug}`,
+      lastModified,
+      changeFrequency: 'monthly' as const,
+      priority: 0.85,
+    })),
   ]
 }
