@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { track } from '@vercel/analytics'
+import { track } from '@/lib/analytics'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'

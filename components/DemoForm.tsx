@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { track } from '@vercel/analytics'
+import { track } from '@/lib/analytics'
 import { ArrowRight, Calendar } from 'lucide-react'
 
 const TIME_SLOTS = ['9:00 AM', '11:00 AM', '2:00 PM', '4:00 PM']

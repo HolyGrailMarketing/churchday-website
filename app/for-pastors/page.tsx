@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { track } from '@vercel/analytics'
+import { track } from '@/lib/analytics'
 import {
   ArrowDown,
   ArrowRight,

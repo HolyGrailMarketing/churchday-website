@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { track } from '@vercel/analytics'
+import { track } from '@/lib/analytics'
 import { APP_STORE_URL, PORTAL_URL } from '@/lib/constants'
 import { DENOMINATION_SLUGS, denominations } from '@/data/denominations'
 import { useAndroidWaitlist } from './AndroidWaitlistModal'

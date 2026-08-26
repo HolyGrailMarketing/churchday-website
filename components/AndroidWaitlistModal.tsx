@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState } from 'react'
-import { track } from '@vercel/analytics'
+import { track } from '@/lib/analytics'
 import { Smartphone, X } from 'lucide-react'
 
 type AndroidWaitlistContextValue = {

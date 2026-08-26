@@ -93,6 +93,10 @@ export default function PrivacyPolicy() {
                 authentication.</li>
               <li><strong>Payment Processors:</strong> Donations are handled by our payment provider under their
                 own privacy and security standards.</li>
+              <li><strong>Meta (Facebook/Instagram):</strong> This website — not the App — uses the Meta pixel
+                to measure our advertising. It sets a cookie and reports page views and actions such as
+                requesting a demo to Meta, which may use them to show you our ads. You can opt out in your
+                Facebook or Instagram ad settings, or by blocking cookies in your browser.</li>
               <li><strong>Legal Requirements:</strong> We may disclose information if required by law or to
                 protect the rights and safety of our users.</li>
             </ul>

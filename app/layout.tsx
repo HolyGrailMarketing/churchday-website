@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { AndroidWaitlistProvider } from '@/components/AndroidWaitlistModal'
+import { MetaPixel } from '@/components/MetaPixel'
 import './globals.css'
 
 // www is the canonical host — church-day.com already 301s here at the Vercel
@@ -9,6 +10,10 @@ import './globals.css'
 const SITE_URL = 'https://www.church-day.com'
 const APP_STORE_URL = 'https://apps.apple.com/us/app/churchday/id6765494714'
 const TITLE = 'Church Management Software Jamaica | ChurchDay'
+// Meta domain verification. The DNS TXT record on church-day.com is the
+// primary proof — this tag is the belt-and-braces second method, and the only
+// one that also covers the www host directly.
+const META_DOMAIN_VERIFICATION = process.env.NEXT_PUBLIC_META_DOMAIN_VERIFICATION
 const DESCRIPTION =
   'Run your whole church from one app — members, attendance, tithes in JMD, and a daily devotion. Built in Jamaica. Set up in an afternoon.'
 
@@ -34,6 +39,13 @@ export const metadata: Metadata = {
     description:
       'Members, attendance, tithes in JMD, and a daily devotion — all in one app. Built in Jamaica, for Jamaican churches.',
   },
+  ...(META_DOMAIN_VERIFICATION
+    ? {
+        verification: {
+          other: { 'facebook-domain-verification': META_DOMAIN_VERIFICATION },
+        },
+      }
+    : {}),
   icons: {
     icon: '/logo.png',
     apple: '/logo.png',
@@ -142,9 +154,11 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        {/* Cookieless — collects no personal data, so no consent banner needed. */}
         <Analytics />
         <SpeedInsights />
+        {/* Unlike Vercel Analytics, the Meta pixel does set a cookie (_fbp) and
+            does share behaviour with Meta — see the website section of /privacy. */}
+        <MetaPixel />
       </body>
     </html>
   )

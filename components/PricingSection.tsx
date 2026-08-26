@@ -1,6 +1,6 @@
 'use client'
 
-import { track } from '@vercel/analytics'
+import { track } from '@/lib/analytics'
 import { CheckCircle2 } from 'lucide-react'
 import { PORTAL_SIGNUP_URL } from '@/lib/constants'
 
