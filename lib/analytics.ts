@@ -37,6 +37,15 @@ const STANDARD_EVENTS: Record<string, string> = {
 }
 
 /**
+ * Property names that are reported to Vercel Analytics but never forwarded to
+ * Meta. Meta's Business Tools terms prohibit sending data that reveals
+ * religious belief, and a denomination qualifies — it describes the church
+ * rather than the person, but it plainly implies theirs. Nothing is lost:
+ * the denominational routing happens off the demo email, not in Ads Manager.
+ */
+const META_BLOCKED_PROPS = new Set(['denomination'])
+
+/**
  * Reports one event to Vercel Analytics and to the Meta pixel. Every existing
  * `track()` call site keeps working unchanged — swapping the import is the
  * whole integration.
@@ -47,7 +56,10 @@ export function track(name: string, props?: EventProps) {
   const standard = STANDARD_EVENTS[name]
   // `content_name` keeps our own event name visible in the Events Manager
   // breakdowns even when several of them collapse onto one standard event.
-  const params = { content_name: name, ...(props ?? {}) }
+  const params: Record<string, unknown> = { content_name: name }
+  for (const [key, value] of Object.entries(props ?? {})) {
+    if (!META_BLOCKED_PROPS.has(key)) params[key] = value
+  }
 
   window.fbq?.(standard ? 'track' : 'trackCustom', standard ?? name, params)
 }

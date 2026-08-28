@@ -149,7 +149,7 @@ export function DenominationPage({ denomination: d }: { denomination: Denominati
               See how ChurchDay fits {d.fullName} congregations — no card required.
             </p>
           </div>
-          <DemoForm source={d.demoSourceTag} />
+          <DemoForm source={d.demoSourceTag} defaultDenomination={d.fullName} />
         </div>
       </section>
 

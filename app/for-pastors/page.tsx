@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { track } from '@/lib/analytics'
+import { DEMO_DENOMINATION_OPTIONS } from '@/data/denominations'
 import {
   ArrowDown,
   ArrowRight,
@@ -383,7 +384,7 @@ export default function ForPastors() {
   const [members, setMembers] = useState(180)
   const [revealed, setRevealed] = useState<number | null>(null)
 
-  const [form, setForm] = useState({ name: '', email: '', church: '', phone: '', day: '', time: '' })
+  const [form, setForm] = useState({ name: '', email: '', church: '', denomination: '', phone: '', day: '', time: '' })
   const [submitting, setSubmitting] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
@@ -485,13 +486,14 @@ export default function ForPastors() {
           name: form.name,
           email: form.email,
           church: form.church,
+          denomination: form.denomination,
           phone: form.phone,
           preferredDate: form.day,
           preferredTime: form.time,
         }),
       })
       if (!res.ok) throw new Error('failed')
-      track('demo_submitted', { source: 'for_pastors' })
+      track('demo_submitted', { source: 'for_pastors', denomination: form.denomination || 'unspecified' })
       setSent(true)
     } catch {
       track('demo_failed', { source: 'for_pastors' })
@@ -1219,6 +1221,26 @@ export default function ForPastors() {
                     aria-label="Church name"
                     className="w-full rounded-[3px] border border-white/15 bg-white/5 px-4 py-3 text-[15px] text-white placeholder-white/35 outline-none transition focus:border-gold-500/60"
                   />
+                </div>
+                <div className="relative">
+                  <select
+                    value={form.denomination}
+                    onChange={(e) => setForm({ ...form, denomination: e.target.value })}
+                    aria-label="Which body your church is part of, optional"
+                    className={`w-full appearance-none rounded-[3px] border border-white/15 bg-white/5 px-4 py-3 pr-10 text-[15px] outline-none transition focus:border-gold-500/60 ${
+                      form.denomination ? 'text-white' : 'text-white/40'
+                    }`}
+                  >
+                    <option value="" className="bg-primary-900 text-white/60">
+                      Which body is your church part of? (optional)
+                    </option>
+                    {DEMO_DENOMINATION_OPTIONS.map((option) => (
+                      <option key={option} value={option} className="bg-primary-900 text-white">
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
                 </div>
                 <input
                   required

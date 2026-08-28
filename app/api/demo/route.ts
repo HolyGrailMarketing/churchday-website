@@ -4,7 +4,8 @@ import { NextResponse } from 'next/server'
 export async function POST(request: Request) {
   const resend = new Resend(process.env.RESEND_API_KEY)
   try {
-    const { name, email, church, phone, preferredDate, preferredTime } = await request.json()
+    const { name, email, church, denomination, phone, preferredDate, preferredTime } =
+      await request.json()
 
     if (!name || !email || !church) {
       return NextResponse.json(
@@ -17,7 +18,7 @@ export async function POST(request: Request) {
       from: 'ChurchDay <demos@church-day.com>',
       to: process.env.DEMO_EMAIL!,
       replyTo: email,
-      subject: `New Demo Request from ${name} - ${church}`,
+      subject: `New Demo Request from ${name} - ${church}${denomination ? ` (${denomination})` : ''}`,
       html: `
         <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background: #142535; padding: 24px; border-radius: 12px 12px 0 0;">
@@ -36,6 +37,10 @@ export async function POST(request: Request) {
               <tr>
                 <td style="padding: 12px 0; border-bottom: 1px solid #f3f4f6; font-weight: 600; color: #142535;">Church</td>
                 <td style="padding: 12px 0; border-bottom: 1px solid #f3f4f6; color: #374151;">${church}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px 0; border-bottom: 1px solid #f3f4f6; font-weight: 600; color: #142535;">Denomination</td>
+                <td style="padding: 12px 0; border-bottom: 1px solid #f3f4f6; color: #374151;">${denomination || 'Not given'}</td>
               </tr>
               <tr>
                 <td style="padding: 12px 0; border-bottom: 1px solid #f3f4f6; font-weight: 600; color: #142535;">Phone</td>

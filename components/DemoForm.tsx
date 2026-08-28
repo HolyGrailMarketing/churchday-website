@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { track } from '@/lib/analytics'
+import { DEMO_DENOMINATION_OPTIONS } from '@/data/denominations'
 import { ArrowRight, Calendar } from 'lucide-react'
 
 const TIME_SLOTS = ['9:00 AM', '11:00 AM', '2:00 PM', '4:00 PM']
@@ -25,8 +26,26 @@ function getUpcomingDays() {
 
 // `source` tags which page a demo request came from (Vercel Analytics),
 // mirroring the `source: 'for_pastors'` tag /for-pastors already uses.
-export function DemoForm({ source, defaultChurch = '' }: { source: string; defaultChurch?: string }) {
-  const [form, setForm] = useState({ name: '', email: '', church: defaultChurch, phone: '', day: '', time: '' })
+export function DemoForm({
+  source,
+  defaultChurch = '',
+  // Denomination pages already know which body the visitor belongs to, so they
+  // pre-select it rather than asking a question they've answered by arriving.
+  defaultDenomination = '',
+}: {
+  source: string
+  defaultChurch?: string
+  defaultDenomination?: string
+}) {
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    church: defaultChurch,
+    denomination: defaultDenomination,
+    phone: '',
+    day: '',
+    time: '',
+  })
   const [submitting, setSubmitting] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
@@ -46,13 +65,14 @@ export function DemoForm({ source, defaultChurch = '' }: { source: string; defau
           name: form.name,
           email: form.email,
           church: form.church,
+          denomination: form.denomination,
           phone: form.phone,
           preferredDate: form.day,
           preferredTime: form.time,
         }),
       })
       if (!res.ok) throw new Error('failed')
-      track('demo_submitted', { source })
+      track('demo_submitted', { source, denomination: form.denomination || 'unspecified' })
       setSent(true)
     } catch {
       track('demo_failed', { source })
@@ -98,6 +118,17 @@ export function DemoForm({ source, defaultChurch = '' }: { source: string; defau
           className="w-full rounded-lg border border-primary-200 px-4 py-3 text-primary-900 placeholder-primary-400 outline-none transition focus:border-gold-500"
         />
       </div>
+      <select
+        value={form.denomination}
+        onChange={(e) => setForm({ ...form, denomination: e.target.value })}
+        aria-label="Which body your church is part of, optional"
+        className="w-full rounded-lg border border-primary-200 px-4 py-3 text-primary-900 outline-none transition focus:border-gold-500"
+      >
+        <option value="">Which body is your church part of? (optional)</option>
+        {DEMO_DENOMINATION_OPTIONS.map((d) => (
+          <option key={d} value={d}>{d}</option>
+        ))}
+      </select>
       <input
         required
         type="email"

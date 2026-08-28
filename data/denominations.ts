@@ -235,6 +235,18 @@ export const denominations: Record<string, Denomination> = {
 
 export const DENOMINATION_SLUGS = Object.keys(denominations)
 
+// Options for the demo form's denomination field. The four bodies with landing
+// pages are derived from `denominations` so the two can't drift apart; the rest
+// exist in the market without a page of their own. The value is the label —
+// there's no mapping layer, so it reads the same in the form, the demo email
+// and Vercel Analytics.
+export const DEMO_DENOMINATION_OPTIONS: string[] = [
+  ...DENOMINATION_SLUGS.map((slug) => denominations[slug].fullName),
+  'Seventh-day Adventist',
+  'Another denomination',
+  'Independent / non-denominational',
+]
+
 export function getDenomination(slug: string): Denomination | undefined {
   return denominations[slug]
 }

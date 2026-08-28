@@ -11,7 +11,7 @@ import { Footer } from '@/components/Footer'
 import { FeatureGrid } from '@/components/FeatureGrid'
 import { PricingSection } from '@/components/PricingSection'
 import { useAndroidWaitlist } from '@/components/AndroidWaitlistModal'
-import { DENOMINATION_SLUGS, denominations } from '@/data/denominations'
+import { DEMO_DENOMINATION_OPTIONS, DENOMINATION_SLUGS, denominations } from '@/data/denominations'
 
 const TIME_SLOTS = ['9:00 AM', '11:00 AM', '2:00 PM', '4:00 PM']
 
@@ -36,7 +36,7 @@ function getUpcomingDays() {
 
 export default function Home() {
   const { openWaitlist } = useAndroidWaitlist()
-  const [demoForm, setDemoForm] = useState({ name: '', email: '', church: '', phone: '' })
+  const [demoForm, setDemoForm] = useState({ name: '', email: '', church: '', denomination: '', phone: '' })
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
@@ -55,7 +55,7 @@ export default function Home() {
     setSelectedDate('')
     setSelectedTime('')
     setError('')
-    setDemoForm({ name: '', email: '', church: '', phone: '' })
+    setDemoForm({ name: '', email: '', church: '', denomination: '', phone: '' })
     setScheduleOpen(true)
   }
 
@@ -78,11 +78,12 @@ export default function Home() {
       // arrives by email via /api/demo.
       track('demo_submitted', {
         preferredTime: selectedTime,
+        denomination: demoForm.denomination || 'unspecified',
         gavePhone: Boolean(demoForm.phone),
       })
 
       setStep(3)
-      setDemoForm({ name: '', email: '', church: '', phone: '' })
+      setDemoForm({ name: '', email: '', church: '', denomination: '', phone: '' })
     } catch {
       // Worth its own event: a spike here means the Resend key or DEMO_EMAIL
       // is broken and leads are being silently lost.
@@ -505,6 +506,17 @@ export default function Home() {
                       className="w-full px-4 py-3 bg-primary-50 border-2 border-primary-100 rounded-lg text-primary-900 placeholder-primary-400 focus:outline-none focus:border-gold-400 focus:bg-white transition"
                       placeholder="Church name"
                     />
+                    <select
+                      value={demoForm.denomination}
+                      onChange={(e) => setDemoForm({ ...demoForm, denomination: e.target.value })}
+                      aria-label="Which body your church is part of, optional"
+                      className="w-full px-4 py-3 bg-primary-50 border-2 border-primary-100 rounded-lg text-primary-900 focus:outline-none focus:border-gold-400 focus:bg-white transition"
+                    >
+                      <option value="">Which body is your church part of? (optional)</option>
+                      {DEMO_DENOMINATION_OPTIONS.map((d) => (
+                        <option key={d} value={d}>{d}</option>
+                      ))}
+                    </select>
                     <input
                       type="email"
                       required
