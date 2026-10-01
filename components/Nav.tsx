@@ -5,7 +5,7 @@ import { track } from '@/lib/analytics'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
-import { PORTAL_URL } from '@/lib/constants'
+import { PORTAL_URL, PORTAL_SIGNUP_URL } from '@/lib/constants'
 
 // Every page that mounts this must include matching #features/#pricing/
 // #how-it-works section ids — the links are always same-page anchors, no
@@ -34,12 +34,21 @@ export function Nav() {
             >
               For Pastors
             </Link>
+            {/* Sign-in is for churches we already have; the nav's one button
+                should be working on the ones we don't. */}
             <a
               href={PORTAL_URL}
               onClick={() => track('portal_signin', { from: 'nav' })}
-              className="btn-primary"
+              className="text-white/70 hover:text-gold-400 transition"
             >
-              Church sign in
+              Sign in
+            </a>
+            <a
+              href={PORTAL_SIGNUP_URL}
+              onClick={() => track('portal_signup', { from: 'nav' })}
+              className="btn-primary whitespace-nowrap"
+            >
+              Start free trial
             </a>
           </div>
 
@@ -69,12 +78,22 @@ export function Nav() {
               For Pastors
             </Link>
             <a
+              href={PORTAL_SIGNUP_URL}
+              onClick={() => {
+                setMobileMenuOpen(false)
+                track('portal_signup', { from: 'mobile_nav' })
+              }}
+              className="btn-primary block w-full mt-2 text-center"
+            >
+              Start 30-day free trial
+            </a>
+            <a
               href={PORTAL_URL}
               onClick={() => {
                 setMobileMenuOpen(false)
                 track('portal_signin', { from: 'mobile_nav' })
               }}
-              className="btn-primary block w-full mt-2 text-center"
+              className="block w-full mt-2 py-2 text-center text-white/70 hover:text-gold-400"
             >
               Church sign in
             </a>

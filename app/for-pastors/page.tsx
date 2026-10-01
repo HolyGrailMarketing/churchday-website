@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { track } from '@/lib/analytics'
 import { DEMO_DENOMINATION_OPTIONS } from '@/data/denominations'
+import { PORTAL_SIGNUP_URL } from '@/lib/constants'
 import {
   ArrowDown,
   ArrowRight,
@@ -299,8 +300,9 @@ const STEPS = [
   },
 ]
 
-// The church management portal (Flutter web, deployed separately).
-const PORTAL_SIGNUP_URL = 'https://app.church-day.com/?signup=1'
+// Imported from lib/constants rather than re-declared: a local copy meant a
+// change to the signup URL (such as the ?plan= parameter) silently missed this
+// page.
 
 const TIME_SLOTS = ['9:00 AM', '11:00 AM', '2:00 PM', '4:00 PM']
 
@@ -1087,8 +1089,9 @@ export default function ForPastors() {
           </div>
 
           <p className="mt-8 text-[14px] text-primary-900/55">
-            Start with a 14-day free trial — no card required. Prices in Jamaican dollars; pay monthly,
-            cancel anytime.
+            Start with 30 days free. We verify your card when you sign up — you&rsquo;re not charged
+            until the trial ends, and cancelling before then costs nothing. Prices in Jamaican
+            dollars; pay monthly, cancel anytime.
           </p>
         </Sheet>
 
@@ -1141,7 +1144,7 @@ export default function ForPastors() {
               Set up your church <ArrowRight className="h-4 w-4" />
             </a>
             <p className="text-[15px] text-primary-900/60">
-              Free for 14 days, no card required. Would rather be walked through it?{' '}
+              Free for 30 days — card verified at signup, nothing charged until day 30. Would rather be walked through it?{' '}
               <button
                 type="button"
                 onClick={() => {
@@ -1165,7 +1168,7 @@ export default function ForPastors() {
                 Let&rsquo;s bring your church online together.
               </h2>
               <p className="mt-5 max-w-md text-[17px] leading-relaxed text-white/65">
-                Spend less time on admin and more time with your people. Try ChurchDay free for 14 days —
+                Spend less time on admin and more time with your people. Try ChurchDay free for 30 days —
                 we&rsquo;ll help you every step of the way.
               </p>
               <p className="mt-10 text-[11px] uppercase tracking-[0.3em] text-gold-400/70">
