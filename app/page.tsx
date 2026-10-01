@@ -130,7 +130,7 @@ export default function Home() {
           <p className="text-lg sm:text-xl text-white/75 mb-10 max-w-2xl mx-auto animate-slide-up leading-relaxed">
             The all-in-one platform that brings your congregation closer together. Manage,
             engage, and grow your church community &mdash;{' '}
-            <span className="text-gold-400 font-medium">free for your first 30&nbsp;days</span>.
+            <span className="text-gold-400 font-medium">free for your whole church</span>.
           </p>
 
           {/* CTA Buttons */}
@@ -146,14 +146,14 @@ export default function Home() {
               onClick={() => track('portal_signup', { from: 'hero' })}
               className="px-8 py-4 border-2 border-gold-500/40 text-gold-400 rounded-lg font-semibold hover:bg-gold-500/10 transition-all duration-300"
             >
-              Start your 30-day free trial
+              Create your church free
             </a>
           </div>
 
-          {/* Says the quiet part out loud. A card is required, and a church that
-              finds that out only at the payment step feels misled. */}
+          {/* The free tier replaced the trial, so there is no card to disclose
+              any more. Said plainly anyway, because "free" invites the question. */}
           <p className="mt-5 text-sm text-white/45 animate-slide-up">
-            Card verified at signup &nbsp;·&nbsp; nothing charged for 30&nbsp;days &nbsp;·&nbsp; cancel anytime
+            No card &nbsp;·&nbsp; no trial to run out &nbsp;·&nbsp; giving works on day one
           </p>
 
           {/* Deliberately quiet: the demo request is the conversion, so the brief
@@ -353,7 +353,7 @@ export default function Home() {
         </div>
       </section>
 
-      <PricingSection />
+      <PricingSection onContactSales={() => openSchedule('pricing_multisite')} />
 
       <Footer />
 
