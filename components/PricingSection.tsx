@@ -2,11 +2,12 @@
 
 import { track } from '@/lib/analytics'
 import { CheckCircle2 } from 'lucide-react'
-import { PORTAL_SIGNUP_URL } from '@/lib/constants'
+import { portalSignupUrl, type PlanId } from '@/lib/constants'
 
 const PLANS = [
   {
     name: 'Starter',
+    id: 'starter' as PlanId,
     price: '4,500',
     description: 'For small churches getting started',
     members: 'Up to 100 members',
@@ -22,6 +23,7 @@ const PLANS = [
   },
   {
     name: 'Growth',
+    id: 'growth' as PlanId,
     price: '8,500',
     description: 'For growing congregations',
     members: 'Up to 500 members',
@@ -38,6 +40,7 @@ const PLANS = [
   },
   {
     name: 'Pro',
+    id: 'pro' as PlanId,
     price: '12,500',
     description: 'For established churches',
     members: 'Unlimited members',
@@ -69,7 +72,7 @@ export function PricingSection({ sourcePrefix = 'pricing' }: { sourcePrefix?: st
             Simple, Transparent Pricing
           </h2>
           <p className="text-lg text-primary-700/70 max-w-2xl mx-auto">
-            Choose the plan that fits your congregation. All plans include a 14-day free trial.
+            Choose the plan that fits your congregation. Every plan starts with 30 days free — we verify your card up front, but you&rsquo;re not charged until the trial ends.
           </p>
         </div>
 
@@ -122,7 +125,7 @@ export function PricingSection({ sourcePrefix = 'pricing' }: { sourcePrefix?: st
                 ))}
               </ul>
               <a
-                href={PORTAL_SIGNUP_URL}
+                href={portalSignupUrl(plan.id)}
                 onClick={() =>
                   track('portal_signup', { from: `${sourcePrefix}_${plan.name.toLowerCase()}` })
                 }
@@ -132,7 +135,7 @@ export function PricingSection({ sourcePrefix = 'pricing' }: { sourcePrefix?: st
                     : 'border-2 border-primary-900 text-primary-900 hover:bg-primary-900 hover:text-white'
                 }`}
               >
-                Get Started
+                Start free trial
               </a>
             </div>
           ))}

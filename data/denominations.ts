@@ -69,7 +69,7 @@ export const denominations: Record<string, Denomination> = {
       },
       {
         q: 'What does it cost, and how long does setup take?',
-        a: 'Plans start at J$4,500/month for up to 100 members, with a 14-day free trial and no card required. Most churches are live within an afternoon — create your church, add your people at your own pace, and invite your congregation with one link.',
+        a: 'Plans start at J$4,500/month for up to 100 members, with a 30-day free trial. We verify your card when you sign up, but nothing is charged until the trial ends — cancel before then and you pay nothing. Most churches are live within an afternoon — create your church, add your people at your own pace, and invite your congregation with one link.',
       },
     ],
     demoSourceTag: 'ntcog',
@@ -119,13 +119,13 @@ export const denominations: Record<string, Denomination> = {
       },
       {
         q: 'What does it cost, and how long does setup take?',
-        a: 'Plans start at J$4,500/month for up to 100 members, with a 14-day free trial and no card required. Most churches are live within an afternoon — create your church, add your people at your own pace, and invite your congregation with one link.',
+        a: 'Plans start at J$4,500/month for up to 100 members, with a 30-day free trial. We verify your card when you sign up, but nothing is charged until the trial ends — cancel before then and you pay nothing. Most churches are live within an afternoon — create your church, add your people at your own pace, and invite your congregation with one link.',
       },
     ],
     demoSourceTag: 'jbu',
     metaTitle: 'Church Management Software for Jamaica Baptist Union | ChurchDay Jamaica',
     metaDescription:
-      "Membership, attendance, and JMD tithes in one app — built for Jamaica Baptist Union's 337 congregations. Set up in an afternoon, 14-day free trial.",
+      "Membership, attendance, and JMD tithes in one app — built for Jamaica Baptist Union's 337 congregations. Set up in an afternoon, 30-day free trial.",
   },
   cogop: {
     slug: 'cogop',
@@ -171,7 +171,7 @@ export const denominations: Record<string, Denomination> = {
       },
       {
         q: 'What does it cost, and how long does setup take?',
-        a: 'Plans start at J$4,500/month for up to 100 members, with a 14-day free trial and no card required. Most churches are live within an afternoon — create your church, add your people at your own pace, and invite your congregation with one link.',
+        a: 'Plans start at J$4,500/month for up to 100 members, with a 30-day free trial. We verify your card when you sign up, but nothing is charged until the trial ends — cancel before then and you pay nothing. Most churches are live within an afternoon — create your church, add your people at your own pace, and invite your congregation with one link.',
       },
     ],
     demoSourceTag: 'cogop',
@@ -223,7 +223,7 @@ export const denominations: Record<string, Denomination> = {
       },
       {
         q: 'What does it cost, and how long does setup take?',
-        a: 'Plans start at J$4,500/month for up to 100 members, with a 14-day free trial and no card required. Most churches are live within an afternoon — create your church, add your people at your own pace, and invite your congregation with one link.',
+        a: 'Plans start at J$4,500/month for up to 100 members, with a 30-day free trial. We verify your card when you sign up, but nothing is charged until the trial ends — cancel before then and you pay nothing. Most churches are live within an afternoon — create your church, add your people at your own pace, and invite your congregation with one link.',
       },
     ],
     demoSourceTag: 'ucjci',

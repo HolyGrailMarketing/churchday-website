@@ -11,7 +11,7 @@ import { Footer } from '@/components/Footer'
 import { FeatureGrid } from '@/components/FeatureGrid'
 import { PricingSection } from '@/components/PricingSection'
 import { useAndroidWaitlist } from '@/components/AndroidWaitlistModal'
-import { DEMO_DENOMINATION_OPTIONS, DENOMINATION_SLUGS, denominations } from '@/data/denominations'
+import { DEMO_DENOMINATION_OPTIONS } from '@/data/denominations'
 
 const TIME_SLOTS = ['9:00 AM', '11:00 AM', '2:00 PM', '4:00 PM']
 
@@ -128,7 +128,9 @@ export default function Home() {
 
           {/* Subheadline */}
           <p className="text-lg sm:text-xl text-white/75 mb-10 max-w-2xl mx-auto animate-slide-up leading-relaxed">
-            The all-in-one platform that brings your congregation closer together. Manage, engage, and grow your church community.
+            The all-in-one platform that brings your congregation closer together. Manage,
+            engage, and grow your church community &mdash;{' '}
+            <span className="text-gold-400 font-medium">free for your first 30&nbsp;days</span>.
           </p>
 
           {/* CTA Buttons */}
@@ -144,9 +146,15 @@ export default function Home() {
               onClick={() => track('portal_signup', { from: 'hero' })}
               className="px-8 py-4 border-2 border-gold-500/40 text-gold-400 rounded-lg font-semibold hover:bg-gold-500/10 transition-all duration-300"
             >
-              Set up your church
+              Start your 30-day free trial
             </a>
           </div>
+
+          {/* Says the quiet part out loud. A card is required, and a church that
+              finds that out only at the payment step feels misled. */}
+          <p className="mt-5 text-sm text-white/45 animate-slide-up">
+            Card verified at signup &nbsp;·&nbsp; nothing charged for 30&nbsp;days &nbsp;·&nbsp; cancel anytime
+          </p>
 
           {/* Deliberately quiet: the demo request is the conversion, so the brief
               sits underneath the buttons as an option rather than competing with
@@ -160,24 +168,6 @@ export default function Home() {
               Or read the five-minute brief
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
-          </div>
-
-          {/* Same quiet treatment as the brief link above — denomination
-              pages are for outreach, not a headline feature. */}
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1 animate-slide-up">
-            <span className="text-xs text-white/30">Built for</span>
-            {DENOMINATION_SLUGS.map((slug, i) => (
-              <span key={slug} className="text-xs text-white/30">
-                <Link
-                  href={`/for/${slug}`}
-                  onClick={() => track('denomination_page_opened', { source: 'hero', denomination: slug })}
-                  className="text-white/50 underline-offset-4 transition hover:text-gold-400 hover:underline"
-                >
-                  {denominations[slug].shortName}
-                </Link>
-                {i < DENOMINATION_SLUGS.length - 1 ? ',' : '.'}
-              </span>
-            ))}
           </div>
 
           {/* App Store Badges */}
