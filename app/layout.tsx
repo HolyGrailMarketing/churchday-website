@@ -3,6 +3,7 @@ import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { AndroidWaitlistProvider } from '@/components/AndroidWaitlistModal'
 import { MetaPixel } from '@/components/MetaPixel'
+import { PLANS } from '@/lib/plans'
 import './globals.css'
 
 // www is the canonical host — church-day.com already 301s here at the Vercel
@@ -93,50 +94,23 @@ const jsonLd = {
       applicationCategory: 'BusinessApplication',
       url: APP_STORE_URL,
       publisher: { '@id': `${SITE_URL}/#organization` },
-      offers: [
-        {
-          '@type': 'Offer',
-          name: 'Starter',
-          price: '4500',
+      // Generated from the tier table so the structured data cannot drift from
+      // the page. The free tier is advertised too: a J$0 offer is how search
+      // results show "free", which is the whole positioning.
+      offers: PLANS.map((plan) => ({
+        '@type': 'Offer',
+        name: plan.name,
+        price: String(plan.price),
+        priceCurrency: 'JMD',
+        priceSpecification: {
+          '@type': 'UnitPriceSpecification',
+          price: String(plan.price),
           priceCurrency: 'JMD',
-          priceSpecification: {
-            '@type': 'UnitPriceSpecification',
-            price: '4500',
-            priceCurrency: 'JMD',
-            billingDuration: 1,
-            billingIncrement: 1,
-            unitCode: 'MON',
-          },
+          billingDuration: 1,
+          billingIncrement: 1,
+          unitCode: 'MON',
         },
-        {
-          '@type': 'Offer',
-          name: 'Growth',
-          price: '8500',
-          priceCurrency: 'JMD',
-          priceSpecification: {
-            '@type': 'UnitPriceSpecification',
-            price: '8500',
-            priceCurrency: 'JMD',
-            billingDuration: 1,
-            billingIncrement: 1,
-            unitCode: 'MON',
-          },
-        },
-        {
-          '@type': 'Offer',
-          name: 'Pro',
-          price: '12500',
-          priceCurrency: 'JMD',
-          priceSpecification: {
-            '@type': 'UnitPriceSpecification',
-            price: '12500',
-            priceCurrency: 'JMD',
-            billingDuration: 1,
-            billingIncrement: 1,
-            unitCode: 'MON',
-          },
-        },
-      ],
+      })),
     },
   ],
 }

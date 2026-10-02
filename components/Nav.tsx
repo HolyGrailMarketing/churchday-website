@@ -48,7 +48,7 @@ export function Nav() {
               onClick={() => track('portal_signup', { from: 'nav' })}
               className="btn-primary whitespace-nowrap"
             >
-              Start free trial
+              Get started free
             </a>
           </div>
 
@@ -85,7 +85,7 @@ export function Nav() {
               }}
               className="btn-primary block w-full mt-2 text-center"
             >
-              Start 30-day free trial
+              Get started free
             </a>
             <a
               href={PORTAL_URL}

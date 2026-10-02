@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { track } from '@/lib/analytics'
 import { DEMO_DENOMINATION_OPTIONS } from '@/data/denominations'
 import { PORTAL_SIGNUP_URL } from '@/lib/constants'
+import { PLANS, FOUNDING_OFFER, foundingOfferFor, planForGiving, formatJmd } from '@/lib/plans'
 import {
   ArrowDown,
   ArrowRight,
@@ -252,39 +253,6 @@ const QUESTIONS = [
   },
 ]
 
-const PLANS = [
-  {
-    name: 'Starter',
-    price: '4,500',
-    ceiling: 100,
-    members: 'Up to 100 members',
-    blurb: 'For small churches getting started',
-    features: ['Member directory', 'Attendance tracking', 'Event calendar', 'Announcements', 'Prayer requests'],
-  },
-  {
-    name: 'Growth',
-    price: '8,500',
-    ceiling: 500,
-    members: 'Up to 500 members',
-    blurb: 'For growing congregations',
-    features: [
-      'Everything in Starter',
-      'Online tithes & offerings',
-      'Ministry groups',
-      'Reports & analytics',
-      'Communication hub',
-    ],
-  },
-  {
-    name: 'Pro',
-    price: '12,500',
-    ceiling: Infinity,
-    members: 'Unlimited members',
-    blurb: 'For large or multi-site churches',
-    features: ['Everything in Growth', 'Custom branding', 'Advanced finance', 'Priority support'],
-  },
-]
-
 const STEPS = [
   {
     title: 'Create your church',
@@ -300,9 +268,8 @@ const STEPS = [
   },
 ]
 
-// Imported from lib/constants rather than re-declared: a local copy meant a
-// change to the signup URL (such as the ?plan= parameter) silently missed this
-// page.
+// Imported rather than re-declared: local copies of the signup URL and of the
+// tier table both drifted out of step with the real ones before.
 
 const TIME_SLOTS = ['9:00 AM', '11:00 AM', '2:00 PM', '4:00 PM']
 
@@ -383,7 +350,10 @@ export default function ForPastors() {
   const [tourTouched, setTourTouched] = useState(false)
   const [feature, setFeature] = useState(0)
   const [openQuestion, setOpenQuestion] = useState<number | null>(0)
-  const [members, setMembers] = useState(180)
+  // Banded on monthly digital giving, not member count — the pricing model
+  // meters what comes through the app. Default sits just inside Ministry, which
+  // is where a church with a working giving flow lands within a month or two.
+  const [giving, setGiving] = useState(250_000)
   const [revealed, setRevealed] = useState<number | null>(null)
 
   const [form, setForm] = useState({ name: '', email: '', church: '', denomination: '', phone: '', day: '', time: '' })
@@ -474,7 +444,8 @@ export default function ForPastors() {
     return () => window.removeEventListener('keydown', onKey)
   }, [active, goTo])
 
-  const plan = members <= 100 ? 0 : members <= 500 ? 1 : 2
+  const recommended = planForGiving(giving)
+  const plan = PLANS.findIndex((p) => p.id === recommended.id)
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -1026,28 +997,34 @@ export default function ForPastors() {
           </h2>
 
           <div className="doc-no-print mt-8 max-w-xl">
-            <label htmlFor="members" className="text-[14px] text-primary-900/70">
-              How many members does your church have?
+            <label htmlFor="giving" className="text-[14px] text-primary-900/70">
+              Roughly how much giving would come through the app each month?
             </label>
             <div className="mt-3 flex items-center gap-4">
               <input
-                id="members"
+                id="giving"
                 type="range"
-                min={20}
-                max={1200}
-                step={10}
-                value={members}
-                onChange={(e) => setMembers(Number(e.target.value))}
+                min={0}
+                max={1_200_000}
+                step={25_000}
+                value={giving}
+                onChange={(e) => setGiving(Number(e.target.value))}
                 className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-primary-900/15 accent-gold-500"
               />
-              <span className="w-20 shrink-0 text-right font-display text-xl font-semibold tabular-nums text-primary-900">
-                {members >= 1200 ? '1,200+' : members.toLocaleString()}
+              <span className="w-28 shrink-0 text-right font-display text-xl font-semibold tabular-nums text-primary-900">
+                {giving >= 1_200_000 ? 'J$1.2M+' : `J$${formatJmd(giving)}`}
               </span>
             </div>
             <p className="mt-3 text-[14px] text-primary-900/60">
               We recommend{' '}
-              <span className="font-semibold text-primary-900">{PLANS[plan].name}</span> — J$
-              {PLANS[plan].price} per month.
+              <span className="font-semibold text-primary-900">{recommended.name}</span>
+              {recommended.price === 0
+                ? ' — free.'
+                : foundingOfferFor(recommended)
+                  ? ` — J$${formatJmd(foundingOfferFor(recommended)!.price)} per month at the
+                      Founding Church rate, instead of J$${formatJmd(recommended.price)}.`
+                  : ` — J$${formatJmd(recommended.price)} per month.`}{' '}
+              Your members are never counted or capped.
             </p>
           </div>
 
@@ -1069,12 +1046,30 @@ export default function ForPastors() {
                     </p>
                   )}
                   <h3 className="font-display text-xl font-semibold text-primary-900">{item.name}</h3>
-                  <p className="mt-1 text-[13px] text-primary-900/55">{item.blurb}</p>
+                  <p className="mt-1 text-[13px] text-primary-900/55">{item.description}</p>
                   <p className="mt-5 font-display text-3xl font-bold text-primary-900">
-                    J${item.price}
-                    <span className="ml-1 text-[14px] font-normal text-primary-900/50">/month</span>
+                    {item.price === 0
+                      ? 'Free'
+                      : `J$${formatJmd(foundingOfferFor(item)?.price ?? item.price)}`}
+                    {item.price > 0 && (
+                      <span className="ml-1 text-[14px] font-normal text-primary-900/50">/month</span>
+                    )}
+                    {foundingOfferFor(item) && (
+                      <span className="ml-2 text-[15px] font-normal text-primary-900/40 line-through">
+                        J${formatJmd(item.price)}
+                      </span>
+                    )}
                   </p>
-                  <p className="mt-1 text-[13px] font-medium text-gold-700">{item.members}</p>
+                  {foundingOfferFor(item) && (
+                    <p className="doc-no-print mt-1 text-[12px] font-semibold uppercase tracking-[0.12em] text-gold-700">
+                      Founding rate · {foundingOfferFor(item)!.months} months
+                    </p>
+                  )}
+                  <p className="mt-1 text-[13px] font-medium text-gold-700">
+                    {item.givingCeiling === null
+                      ? 'No ceiling on giving'
+                      : `Giving up to J$${formatJmd(item.givingCeiling)} a month`}
+                  </p>
                   <ul className="mt-5 space-y-2.5 border-t border-primary-900/8 pt-5">
                     {item.features.map((f) => (
                       <li key={f} className="flex gap-2.5 text-[14px] leading-snug text-primary-900/70">
@@ -1089,9 +1084,18 @@ export default function ForPastors() {
           </div>
 
           <p className="mt-8 text-[14px] text-primary-900/55">
-            Start with 30 days free. We verify your card when you sign up — you&rsquo;re not charged
-            until the trial ends, and cancelling before then costs nothing. Prices in Jamaican
-            dollars; pay monthly, cancel anytime.
+            The Congregation plan is free for your whole church, with no card and no trial
+            running out. Plans are banded on the giving that comes through the app, never on
+            your membership — and every paid plan costs under 1.6% of the giving it covers.
+            Annual billing is ten months for twelve.
+            {FOUNDING_OFFER && (
+              <>
+                {' '}
+                The first {FOUNDING_OFFER.slots} churches pay J$
+                {formatJmd(FOUNDING_OFFER.price)} a month for Ministry — held for{' '}
+                {FOUNDING_OFFER.months} months, and it cannot go up in that time.
+              </>
+            )}
           </p>
         </Sheet>
 
