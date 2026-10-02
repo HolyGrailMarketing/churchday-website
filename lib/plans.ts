@@ -107,26 +107,42 @@ export const FREE_PLAN = PLANS[0]
 export const ENTRY_PAID_PLAN = PLANS[1]
 
 /**
- * The launch offer on Ministry — `founder/pricing-strategy.md` §6.
+ * The Founding Church launch offer — `founder/pricing-strategy.md` §6.
  *
- * Deliberately a separate object rather than a changed price, so the J$9,500
- * list price still does its anchoring work and this can be removed in one edit
- * when the 25 slots are gone. "Locked for 24 months", never "forever": at ~48
- * paying churches the margin is needed, and a promise broken later costs more
- * than the discount saved.
+ * This is a real price lock, not a banner: a church that takes it is charged
+ * this rate for `months` months, stamped onto its subscription server-side so a
+ * later change to the list price cannot touch it. Mirrors `foundingOffer` in
+ * `functions/src/billingPlans.ts`, which is what actually decides whether a
+ * given church gets it.
  *
- * Set to null to take the offer down.
+ * The list price stays on the page, struck through. A discount with nothing to
+ * compare it against is just a price — and J$9,500 is also the number the
+ * church will pay once the lock ends, so hiding it would be a bad surprise
+ * rather than a good deal.
+ *
+ * "Locked for 24 months", never "forever": at roughly 48 paying churches the
+ * margin is needed, and a promise broken later costs more than the discount.
+ *
+ * Set to null to take the offer down — the page falls back to list pricing
+ * with no other edit.
  */
 export const FOUNDING_OFFER: {
+  planId: PlanId
   price: number
   annual: number
   months: number
   slots: number
 } | null = {
+  planId: 'ministry',
   price: 4_500,
   annual: 45_000,
   months: 24,
   slots: 25,
+}
+
+/** The offer for `plan`, or null when none applies. */
+export function foundingOfferFor(plan: Plan) {
+  return FOUNDING_OFFER && FOUNDING_OFFER.planId === plan.id ? FOUNDING_OFFER : null
 }
 
 /** `28,000` — the thousands separator every price on the site is written with. */
@@ -154,5 +170,8 @@ export function planForGiving(monthlyGiving: number): Plan {
  */
 export function shareOfGiving(plan: Plan): number | null {
   if (plan.price === 0 || plan.givingCeiling === null) return null
-  return plan.price / plan.givingCeiling
+  // Measured against what the church actually pays, so the figure matches the
+  // price printed directly above it.
+  const offer = foundingOfferFor(plan)
+  return (offer ? offer.price : plan.price) / plan.givingCeiling
 }

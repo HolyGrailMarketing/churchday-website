@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { track } from '@/lib/analytics'
 import { DEMO_DENOMINATION_OPTIONS } from '@/data/denominations'
 import { PORTAL_SIGNUP_URL } from '@/lib/constants'
-import { PLANS, FOUNDING_OFFER, planForGiving, formatJmd } from '@/lib/plans'
+import { PLANS, FOUNDING_OFFER, foundingOfferFor, planForGiving, formatJmd } from '@/lib/plans'
 import {
   ArrowDown,
   ArrowRight,
@@ -1020,7 +1020,10 @@ export default function ForPastors() {
               <span className="font-semibold text-primary-900">{recommended.name}</span>
               {recommended.price === 0
                 ? ' — free.'
-                : ` — J$${formatJmd(recommended.price)} per month.`}{' '}
+                : foundingOfferFor(recommended)
+                  ? ` — J$${formatJmd(foundingOfferFor(recommended)!.price)} per month at the
+                      Founding Church rate, instead of J$${formatJmd(recommended.price)}.`
+                  : ` — J$${formatJmd(recommended.price)} per month.`}{' '}
               Your members are never counted or capped.
             </p>
           </div>
@@ -1045,11 +1048,23 @@ export default function ForPastors() {
                   <h3 className="font-display text-xl font-semibold text-primary-900">{item.name}</h3>
                   <p className="mt-1 text-[13px] text-primary-900/55">{item.description}</p>
                   <p className="mt-5 font-display text-3xl font-bold text-primary-900">
-                    {item.price === 0 ? 'Free' : `J$${formatJmd(item.price)}`}
+                    {item.price === 0
+                      ? 'Free'
+                      : `J$${formatJmd(foundingOfferFor(item)?.price ?? item.price)}`}
                     {item.price > 0 && (
                       <span className="ml-1 text-[14px] font-normal text-primary-900/50">/month</span>
                     )}
+                    {foundingOfferFor(item) && (
+                      <span className="ml-2 text-[15px] font-normal text-primary-900/40 line-through">
+                        J${formatJmd(item.price)}
+                      </span>
+                    )}
                   </p>
+                  {foundingOfferFor(item) && (
+                    <p className="doc-no-print mt-1 text-[12px] font-semibold uppercase tracking-[0.12em] text-gold-700">
+                      Founding rate · {foundingOfferFor(item)!.months} months
+                    </p>
+                  )}
                   <p className="mt-1 text-[13px] font-medium text-gold-700">
                     {item.givingCeiling === null
                       ? 'No ceiling on giving'
@@ -1076,9 +1091,9 @@ export default function ForPastors() {
             {FOUNDING_OFFER && (
               <>
                 {' '}
-                The first {FOUNDING_OFFER.slots} churches get Ministry at J$
-                {formatJmd(FOUNDING_OFFER.price)} a month, locked for {FOUNDING_OFFER.months}{' '}
-                months.
+                The first {FOUNDING_OFFER.slots} churches pay J$
+                {formatJmd(FOUNDING_OFFER.price)} a month for Ministry — held for{' '}
+                {FOUNDING_OFFER.months} months, and it cannot go up in that time.
               </>
             )}
           </p>

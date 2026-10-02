@@ -3,7 +3,7 @@
 import { track } from '@/lib/analytics'
 import { CheckCircle2 } from 'lucide-react'
 import { portalSignupUrl } from '@/lib/constants'
-import { PLANS, FOUNDING_OFFER, formatJmd, shareOfGiving, type Plan } from '@/lib/plans'
+import { PLANS, foundingOfferFor, formatJmd, shareOfGiving, type Plan } from '@/lib/plans'
 
 /**
  * `sourcePrefix` tags which page a pricing conversion came from — homepage
@@ -70,7 +70,7 @@ function PlanCard({
 }) {
   const dark = plan.highlighted
   const share = shareOfGiving(plan)
-  const founding = plan.id === 'ministry' ? FOUNDING_OFFER : null
+  const founding = foundingOfferFor(plan)
 
   return (
     <div
@@ -80,10 +80,10 @@ function PlanCard({
           : 'border-primary-100 bg-white hover:border-gold-300'
       }`}
     >
-      {dark && (
+      {(dark || founding) && (
         <div className="absolute -top-4 left-1/2 -translate-x-1/2">
           <span className="px-4 py-1 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 text-sm font-bold rounded-full whitespace-nowrap">
-            Most Popular
+            {founding ? `Limited — first ${founding.slots} churches` : 'Most Popular'}
           </span>
         </div>
       )}
@@ -95,7 +95,7 @@ function PlanCard({
         {plan.description}
       </p>
 
-      <div className="mb-2">
+      <div className="mb-2 flex flex-wrap items-baseline gap-x-2">
         {plan.price === 0 ? (
           <span className={`text-4xl font-bold ${dark ? 'text-white' : 'text-primary-900'}`}>
             Free
@@ -103,20 +103,32 @@ function PlanCard({
         ) : (
           <>
             <span className={`text-4xl font-bold ${dark ? 'text-white' : 'text-primary-900'}`}>
-              ${formatJmd(plan.price)}
+              ${formatJmd(founding ? founding.price : plan.price)}
             </span>
             <span className={`text-sm ${dark ? 'text-white/60' : 'text-primary-700/70'}`}>
-              {' '}JMD/month
+              JMD/month
             </span>
+            {/* The list price stays visible. A discount with nothing to compare
+                it against is just a price — and it is also what the church pays
+                once the lock ends, so hiding it would be a bad surprise. */}
+            {founding && (
+              <span
+                className={`text-base line-through ${dark ? 'text-white/40' : 'text-primary-700/45'}`}
+              >
+                ${formatJmd(plan.price)}
+              </span>
+            )}
           </>
         )}
       </div>
 
       {/* Annual line, and the share-of-giving ratio that justifies the price. */}
       <p className={`text-xs mb-6 ${dark ? 'text-white/45' : 'text-primary-700/55'}`}>
-        {plan.annual
-          ? `or J$${formatJmd(plan.annual)} a year — ten months for twelve`
-          : 'No card, and no end date'}
+        {founding
+          ? `or J$${formatJmd(founding.annual)} a year — your price for ${founding.months} months`
+          : plan.annual
+            ? `or J$${formatJmd(plan.annual)} a year — ten months for twelve`
+            : 'No card, and no end date'}
         {share !== null && ` · ${(share * 100).toFixed(2)}% of the giving it covers`}
       </p>
 
@@ -149,9 +161,9 @@ function PlanCard({
             dark ? 'bg-gold-500/15 text-gold-200' : 'bg-gold-50 text-primary-800'
           }`}
         >
-          <span className="font-semibold">Founding Church rate:</span>{' '}
-          J${formatJmd(founding.price)} a month, locked for {founding.months} months. First{' '}
-          {founding.slots} churches only.
+          <span className="font-semibold">Founding Church rate.</span> Your price is held
+          for {founding.months} months — it cannot go up in that time, whatever happens to
+          our list price. Open to the first {founding.slots} churches.
         </p>
       )}
 
@@ -184,7 +196,11 @@ function PlanCard({
               : 'border-2 border-primary-900 text-primary-900 hover:bg-primary-900 hover:text-white'
           }`}
         >
-          {plan.price === 0 ? 'Create your church free' : `Start on ${plan.name}`}
+          {plan.price === 0
+            ? 'Create your church free'
+            : founding
+              ? 'Claim the Founding rate'
+              : `Start on ${plan.name}`}
         </a>
       )}
     </div>
