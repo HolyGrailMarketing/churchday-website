@@ -278,13 +278,15 @@ export default function Home() {
               { src: '/settings.PNG', label: 'Settings', alt: 'ChurchDay Settings screen for managing account and church preferences' },
             ].map((screenshot, i) => (
               <div key={i} className="flex-shrink-0 snap-center flex flex-col items-center gap-3">
-                <div className="w-[200px] rounded-[24px] overflow-hidden shadow-lg border-[6px] border-primary-900 bg-primary-900">
+                {/* Fixed frame: the captures come from more than one device model,
+                    so letting each image set its own height staggers the labels. */}
+                <div className="w-[200px] aspect-[1206/2622] rounded-[24px] overflow-hidden shadow-lg border-[6px] border-primary-900 bg-primary-900">
                   <Image
                     src={screenshot.src}
                     alt={screenshot.alt}
                     width={200}
-                    height={433}
-                    className="w-full h-auto"
+                    height={435}
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 <span className="text-sm font-medium text-primary-700/70">{screenshot.label}</span>
