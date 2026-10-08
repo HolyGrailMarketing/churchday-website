@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { track } from '@/lib/analytics'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -12,9 +12,25 @@ import { PORTAL_URL, PORTAL_SIGNUP_URL } from '@/lib/constants'
 // cross-page homepage-anchor variant needed.
 export function Nav() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  // Over the hero the bar is clear; once content slides underneath, it becomes
+  // a translucent material so that content stays legible but still visible.
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  const solid = scrolled || mobileMenuOpen
 
   return (
-    <nav className="fixed w-full bg-primary-900/90 backdrop-blur-md z-50 border-b border-white/5">
+    <nav
+      className={`fixed w-full z-50 transition-[background-color,box-shadow,backdrop-filter] duration-300 ${
+        solid ? 'material-dark shadow-[0_1px_0_rgb(255_255_255/0.06)]' : 'bg-transparent'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="flex items-center gap-2">
@@ -23,7 +39,7 @@ export function Nav() {
           </Link>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex gap-8 items-center">
+          <div className="hidden md:flex gap-7 items-center text-[15px]">
             <a href="#features" className="text-white/70 hover:text-gold-400 transition">Features</a>
             <a href="#pricing" className="text-white/70 hover:text-gold-400 transition">Pricing</a>
             <a href="#how-it-works" className="text-white/70 hover:text-gold-400 transition">How It Works</a>
@@ -46,7 +62,7 @@ export function Nav() {
             <a
               href={PORTAL_SIGNUP_URL}
               onClick={() => track('portal_signup', { from: 'nav' })}
-              className="btn-primary whitespace-nowrap"
+              className="btn-gold btn-sm"
             >
               Get started free
             </a>
@@ -54,7 +70,9 @@ export function Nav() {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-white/80"
+            className="press md:hidden -mr-2 p-2 text-white/80"
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileMenuOpen}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X /> : <Menu />}
@@ -63,7 +81,7 @@ export function Nav() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden pb-4 border-t border-white/10">
+          <div className="md:hidden pb-4 border-t border-white/10 animate-caption">
             <a href="#features" className="block py-2 text-white/70 hover:text-gold-400">Features</a>
             <a href="#pricing" className="block py-2 text-white/70 hover:text-gold-400">Pricing</a>
             <a href="#how-it-works" className="block py-2 text-white/70 hover:text-gold-400">How It Works</a>
@@ -83,7 +101,7 @@ export function Nav() {
                 setMobileMenuOpen(false)
                 track('portal_signup', { from: 'mobile_nav' })
               }}
-              className="btn-primary block w-full mt-2 text-center"
+              className="btn-gold w-full mt-3"
             >
               Get started free
             </a>

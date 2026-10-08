@@ -22,23 +22,19 @@ export function PricingSection({
   onContactSales?: () => void
 }) {
   return (
-    <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+    <section id="pricing" className="py-24 sm:py-32 px-4 sm:px-6 lg:px-8 bg-white">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
-          <span className="inline-block px-4 py-1 border border-gold-300 text-gold-600 rounded-full text-xs font-medium mb-4">
-            Pricing
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-primary-900 mb-4">
-            Start free. Pay when your giving grows.
-          </h2>
-          <p className="text-lg text-primary-700/70 max-w-2xl mx-auto">
+          <p className="eyebrow">Pricing</p>
+          <h2 className="headline mt-3">Start free. Pay when your giving grows.</h2>
+          <p className="lede mt-5 max-w-2xl mx-auto">
             Your whole congregation can use ChurchDay for free, with giving working from
             day one. Plans are banded on what comes through the app each month &mdash; not
             on how many members you have.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 items-start">
+        <div className="grid md:grid-cols-3 gap-5 lg:gap-6 items-start">
           {PLANS.map((plan) => (
             <PlanCard
               key={plan.id}
@@ -74,21 +70,21 @@ function PlanCard({
 
   return (
     <div
-      className={`p-8 rounded-2xl border-2 transition-all ${
+      className={`relative p-8 rounded-[28px] ${
         dark
-          ? 'border-gold-400 bg-primary-900 shadow-2xl shadow-gold-500/10 relative'
-          : 'border-primary-100 bg-white hover:border-gold-300'
+          ? 'bg-primary-900 shadow-[0_30px_60px_-30px_rgb(20_37_53/0.6),inset_0_0_0_1px_rgb(212_168_94/0.5)]'
+          : 'bg-[#fbfaf8] shadow-[inset_0_0_0_1px_rgb(20_37_53/0.08)]'
       }`}
     >
       {(dark || founding) && (
         <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-          <span className="px-4 py-1 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 text-sm font-bold rounded-full whitespace-nowrap">
+          <span className="px-3.5 py-1 bg-gold-500 text-primary-900 text-[13px] font-semibold rounded-full whitespace-nowrap shadow-sm">
             {founding ? `Limited — first ${founding.slots} churches` : 'Most Popular'}
           </span>
         </div>
       )}
 
-      <h3 className={`text-xl font-bold mb-1 ${dark ? 'text-gold-400' : 'text-primary-900'}`}>
+      <h3 className={`text-[21px] font-semibold tracking-[-0.018em] mb-1 ${dark ? 'text-gold-400' : 'text-primary-900'}`}>
         {plan.name}
       </h3>
       <p className={`text-sm mb-6 ${dark ? 'text-white/60' : 'text-primary-700/70'}`}>
@@ -97,12 +93,12 @@ function PlanCard({
 
       <div className="mb-2 flex flex-wrap items-baseline gap-x-2">
         {plan.price === 0 ? (
-          <span className={`text-4xl font-bold ${dark ? 'text-white' : 'text-primary-900'}`}>
+          <span className={`text-[40px] font-bold tracking-[-0.03em] ${dark ? 'text-white' : 'text-primary-900'}`}>
             Free
           </span>
         ) : (
           <>
-            <span className={`text-4xl font-bold ${dark ? 'text-white' : 'text-primary-900'}`}>
+            <span className={`text-[40px] font-bold tracking-[-0.03em] ${dark ? 'text-white' : 'text-primary-900'}`}>
               ${formatJmd(founding ? founding.price : plan.price)}
             </span>
             <span className={`text-sm ${dark ? 'text-white/60' : 'text-primary-700/70'}`}>
@@ -178,11 +174,7 @@ function PlanCard({
               document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })
             }
           }}
-          className={`block w-full py-3 rounded-lg font-semibold text-center transition-all duration-300 ${
-            dark
-              ? 'bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 hover:shadow-lg hover:shadow-gold-500/25'
-              : 'border-2 border-primary-900 text-primary-900 hover:bg-primary-900 hover:text-white'
-          }`}
+          className={`w-full ${dark ? 'btn-gold' : 'btn-ink'}`}
         >
           Talk to us
         </button>
@@ -190,11 +182,7 @@ function PlanCard({
         <a
           href={portalSignupUrl(plan.id)}
           onClick={() => track('portal_signup', { from: `${sourcePrefix}_${plan.id}` })}
-          className={`block w-full py-3 rounded-lg font-semibold text-center transition-all duration-300 ${
-            dark
-              ? 'bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 hover:shadow-lg hover:shadow-gold-500/25'
-              : 'border-2 border-primary-900 text-primary-900 hover:bg-primary-900 hover:text-white'
-          }`}
+          className={`w-full ${dark ? 'btn-gold' : 'btn-ink'}`}
         >
           {plan.price === 0
             ? 'Create your church free'
