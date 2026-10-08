@@ -140,3 +140,307 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* --- Homepage ------------------------------------------------------------ */
+
+:root {
+  /* One curve for everything that isn't a spring: fast out, long gentle settle. */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  /* iOS sheet curve — used for the demo sheet's slide up and back down. */
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Type. Tracking tightens as size grows; body copy stays near zero. */
+.display {
+  font-size: clamp(2.75rem, 6.6vw, 5.25rem);
+  line-height: 1.02;
+  letter-spacing: -0.038em;
+  font-weight: 700;
+}
+
+.headline {
+  font-size: clamp(2rem, 4.4vw, 3.5rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  color: #142535;
+  text-wrap: balance;
+}
+
+.lede {
+  font-size: clamp(1.0625rem, 1.5vw, 1.3125rem);
+  line-height: 1.5;
+  letter-spacing: -0.006em;
+  color: rgb(20 37 53 / 0.62);
+  text-wrap: pretty;
+}
+
+.eyebrow {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #a68343;
+}
+
+/* Feedback on press, not on release — and instantly. */
+.press,
+.btn-gold,
+.btn-glass,
+.btn-ink {
+  transition-property: transform, color, background-color, border-color, box-shadow, opacity;
+  transition-duration: 180ms;
+  transition-timing-function: var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.press:active,
+.btn-gold:active,
+.btn-glass:active,
+.btn-ink:active {
+  transform: scale(0.97);
+  transition-duration: 60ms;
+}
+
+.btn-gold,
+.btn-glass,
+.btn-ink {
+  @apply inline-flex items-center justify-center gap-2 h-12 px-6 rounded-full text-[17px] font-semibold whitespace-nowrap;
+  letter-spacing: -0.01em;
+}
+
+.btn-gold {
+  background: #d4a85e;
+  color: #142535;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.35), 0 1px 2px rgb(20 37 53 / 0.2);
+}
+
+.btn-gold:hover {
+  background: #e0b96c;
+}
+
+.btn-ink {
+  background: #142535;
+  color: #fff;
+}
+
+.btn-ink:hover {
+  background: #1f3448;
+}
+
+/* A light material for use on the dark hero: the bright top edge is light
+   catching the glass. */
+.btn-glass {
+  background: rgb(255 255 255 / 0.08);
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.14), inset 0 0 0 1px rgb(255 255 255 / 0.1);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.btn-glass:hover {
+  background: rgb(255 255 255 / 0.14);
+}
+
+.btn-sm {
+  @apply h-9 px-4 text-[15px];
+}
+
+/* Nav material: content scrolls underneath it. */
+.material-dark {
+  background: rgb(20 37 53 / 0.86);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+}
+
+.hero-ground {
+  position: relative;
+  overflow: hidden; /* the glow below is wider than a phone screen */
+  background:
+    radial-gradient(60% 55% at 78% 42%, rgb(212 168 94 / 0.22) 0%, rgb(212 168 94 / 0) 70%),
+    radial-gradient(80% 60% at 10% 0%, rgb(74 123 167 / 0.35) 0%, rgb(74 123 167 / 0) 70%),
+    linear-gradient(180deg, #1c3550 0%, #142535 55%, #0f1e2b 100%);
+}
+
+/* A screenshot in a bezel. Corner radii are percentages of the phone's own
+   box, so they stay right at every width. */
+.phone {
+  padding: 3.6%;
+  border-radius: 15.5% / 7.15%;
+  background: linear-gradient(160deg, #2b3a48 0%, #0b141c 45%, #1a2733 100%);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.1),
+    0 0 0 1px rgb(10 20 30 / 0.35),
+    0 40px 70px -30px rgb(10 20 30 / 0.55),
+    0 18px 30px -18px rgb(10 20 30 / 0.4);
+}
+
+.phone img {
+  border-radius: 12.4% / 5.7%;
+}
+
+/* Hero copy arrives in a short cascade. Blur + rise so it reads as settling
+   into place rather than just fading in. */
+.enter {
+  animation: enter 900ms var(--ease-out) both;
+  animation-delay: var(--d, 0ms);
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(6px);
+  }
+}
+
+.animate-caption {
+  animation: caption 320ms var(--ease-out) both;
+}
+
+@keyframes caption {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* The booking succeeded — the one place on the page that earns overshoot. */
+.animate-pop {
+  animation: pop 520ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+
+/* Sections fade up once as they arrive. Only hidden when scripts run, so the
+   page never ships invisible content to a crawler or a script-less browser. */
+@media (scripting: enabled) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 800ms var(--ease-out), transform 900ms var(--ease-out);
+    transition-delay: var(--d, 0ms);
+  }
+
+  .reveal[data-shown='true'] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Demo sheet. A bottom sheet on phones, a floating card above that; either
+   way it leaves along exactly the path it arrived on. */
+.sheet-scrim {
+  background: rgb(8 16 24 / 0.45);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  animation: scrim-in 300ms var(--ease-out) both;
+}
+
+.sheet-scrim[data-leaving='true'] {
+  animation: scrim-out 240ms ease-in both;
+}
+
+.sheet {
+  animation: sheet-up 480ms var(--ease-sheet) both;
+}
+
+.sheet[data-leaving='true'] {
+  animation: sheet-down 280ms cubic-bezier(0.4, 0, 0.9, 0.6) both;
+}
+
+@keyframes scrim-in { from { opacity: 0; } }
+@keyframes scrim-out { to { opacity: 0; } }
+@keyframes sheet-up { from { transform: translateY(100%); } }
+@keyframes sheet-down { to { transform: translateY(100%); } }
+
+@media (min-width: 640px) {
+  .sheet {
+    animation-name: card-in;
+    animation-duration: 380ms;
+    animation-timing-function: var(--ease-out);
+  }
+
+  .sheet[data-leaving='true'] {
+    animation-name: card-out;
+    animation-duration: 200ms;
+    animation-timing-function: ease-in;
+  }
+
+  @keyframes card-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.96);
+      filter: blur(4px);
+    }
+  }
+
+  @keyframes card-out {
+    to {
+      opacity: 0;
+      transform: translateY(12px) scale(0.96);
+      filter: blur(4px);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter,
+  .animate-caption,
+  .animate-pop {
+    animation: fade 200ms ease both;
+  }
+
+  .sheet,
+  .sheet[data-leaving='true'] {
+    animation: fade 200ms ease both;
+  }
+
+  .sheet[data-leaving='true'],
+  .sheet-scrim[data-leaving='true'] {
+    animation: fade-out 160ms ease both;
+  }
+
+  .reveal {
+    transform: none !important;
+    transition: opacity 300ms ease !important;
+  }
+
+  .press:active {
+    transform: none;
+    opacity: 0.7;
+  }
+
+  @keyframes fade { from { opacity: 0; } }
+  @keyframes fade-out { to { opacity: 0; } }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .material-dark {
+    background: #142535;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .btn-glass {
+    background: #2c4d6f;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .lede {
+    color: rgb(20 37 53 / 0.85);
+  }
+
+  .btn-glass {
+    background: #2c4d6f;
+    box-shadow: inset 0 0 0 1.5px #fff;
+  }
+}
