@@ -84,8 +84,8 @@ export function DemoForm({
 
   if (sent) {
     return (
-      <div className="rounded-2xl border border-gold-300 bg-white p-8 text-center">
-        <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-full bg-gold-500">
+      <div className="animate-caption rounded-2xl border border-gold-300 bg-white p-8 text-center">
+        <div className="animate-pop mb-4 inline-flex h-11 w-11 items-center justify-center rounded-full bg-gold-500">
           <Calendar className="h-5 w-5 text-primary-900" />
         </div>
         <h3 className="text-2xl font-bold text-primary-900">
@@ -176,7 +176,7 @@ export function DemoForm({
       <button
         type="submit"
         disabled={submitting}
-        className="w-full rounded-lg bg-gradient-to-r from-gold-500 to-gold-400 py-3.5 font-semibold text-primary-900 transition hover:shadow-lg hover:shadow-gold-500/25 disabled:opacity-50"
+        className="press hover-glow w-full rounded-lg bg-gradient-to-r from-gold-500 to-gold-400 py-3.5 font-semibold text-primary-900 disabled:opacity-50"
       >
         {submitting ? 'Sending…' : <>Request your demo <ArrowRight className="ml-1 inline-block h-4 w-4" /></>}
       </button>

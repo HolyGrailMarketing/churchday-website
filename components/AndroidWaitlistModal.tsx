@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { track } from '@/lib/analytics'
 import { Smartphone, X } from 'lucide-react'
 
@@ -24,14 +24,32 @@ export function AndroidWaitlistProvider({ children }: { children: React.ReactNod
   const [testerSubmitting, setTesterSubmitting] = useState(false)
   const [testerDone, setTesterDone] = useState(false)
   const [testerError, setTesterError] = useState('')
+  // Closing plays the exit first; the sheet unmounts on its animationend.
+  const [leaving, setLeaving] = useState(false)
+  const sheetRef = useRef<HTMLDivElement>(null)
+  const close = () => setLeaving(true)
 
   const openWaitlist = () => {
     track('android_waitlist_opened', { platform: 'android' })
     setTesterDone(false)
     setTesterError('')
     setTesterForm({ email: '', name: '', church: '' })
+    setLeaving(false)
     setOpen(true)
   }
+
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setLeaving(true)
+    document.addEventListener('keydown', onKey)
+    const overflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    sheetRef.current?.focus()
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = overflow
+    }
+  }, [open])
 
   const handleTesterSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -60,42 +78,65 @@ export function AndroidWaitlistProvider({ children }: { children: React.ReactNod
       {children}
 
       {open && (
+        // Same sheet as the homepage demo wizard: up from the bottom on phones,
+        // a floating card above that, and out along the path it came in on.
         <div
-          onClick={() => setOpen(false)}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in"
+          onClick={close}
+          data-leaving={leaving}
+          className="sheet-scrim fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4"
         >
-          <div onClick={(e) => e.stopPropagation()} className="bg-white rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden animate-slide-up">
+          <div
+            ref={sheetRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Test ChurchDay on Android"
+            tabIndex={-1}
+            data-leaving={leaving}
+            onAnimationEnd={(e) => {
+              if (leaving && e.target === e.currentTarget) {
+                setOpen(false)
+                setLeaving(false)
+              }
+            }}
+            onClick={(e) => e.stopPropagation()}
+            className="sheet bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl sm:max-w-md w-full relative overflow-hidden focus:outline-none pb-[env(safe-area-inset-bottom)]"
+          >
             <div className="absolute top-0 right-0 w-40 h-40 bg-gold-100 rounded-full -mr-20 -mt-20 opacity-30" />
             <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary-100 rounded-full -ml-16 -mb-16 opacity-20" />
 
             <button
-              onClick={() => setOpen(false)}
-              className="absolute top-4 right-4 z-20 p-2 hover:bg-primary-100 rounded-full transition"
+              onClick={close}
+              aria-label="Close"
+              className="press absolute top-4 right-4 z-20 p-2 hover:bg-primary-100 rounded-full"
             >
               <X className="w-6 h-6 text-primary-900" />
             </button>
 
             <div className="relative z-10 p-8 text-center">
               <div className="mb-6 inline-block">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-gold-400 to-gold-500 flex items-center justify-center shadow-lg">
+                {/* Re-keyed on success so the icon pops once when the signup lands. */}
+                <div
+                  key={testerDone ? 'done' : 'form'}
+                  className={`${testerDone ? 'animate-pop ' : ''}w-20 h-20 rounded-full bg-gradient-to-br from-gold-400 to-gold-500 flex items-center justify-center shadow-lg`}
+                >
                   <Smartphone className="w-10 h-10 text-white" />
                 </div>
               </div>
 
               {testerDone ? (
-                <>
+                <div className="animate-caption">
                   <h2 className="text-3xl font-bold text-primary-900 mb-3">You&apos;re on the list</h2>
                   <p className="text-sm text-primary-500 mb-6">
                     We&apos;ll add your Google account to the test and email you a link to accept the
                     invitation. Check your inbox for a confirmation now.
                   </p>
                   <button
-                    onClick={() => setOpen(false)}
-                    className="block w-full px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold transition hover:shadow-lg hover:shadow-gold-500/25"
+                    onClick={close}
+                    className="press block w-full px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold hover-glow"
                   >
                     Done
                   </button>
-                </>
+                </div>
               ) : (
                 <>
                   <h2 className="text-3xl font-bold text-primary-900 mb-3">
@@ -153,7 +194,7 @@ export function AndroidWaitlistProvider({ children }: { children: React.ReactNod
                     <button
                       type="submit"
                       disabled={testerSubmitting}
-                      className="block w-full px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold transition hover:shadow-lg hover:shadow-gold-500/25 disabled:opacity-60"
+                      className="press block w-full px-6 py-3 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold hover-glow disabled:opacity-60"
                     >
                       {testerSubmitting ? 'Sending…' : 'Join the test'}
                     </button>

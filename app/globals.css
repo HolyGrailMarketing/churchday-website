@@ -246,6 +246,18 @@ body {
   @apply h-9 px-4 text-[15px];
 }
 
+/* Hover is a pointer affordance only: on touch screens it would stick after
+   the tap. Pressing is handled by .press for every input. */
+@media (hover: hover) and (pointer: fine) {
+  .hover-glow:hover {
+    box-shadow: 0 12px 28px -10px rgb(212 168 94 / 0.55);
+  }
+
+  .hover-glow-ink:hover {
+    box-shadow: 0 12px 28px -10px rgb(20 37 53 / 0.4);
+  }
+}
+
 /* Nav material: content scrolls underneath it. */
 .material-dark {
   background: rgb(20 37 53 / 0.86);
@@ -330,6 +342,38 @@ body {
   .reveal[data-shown='true'] {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* FAQ answers open with their height instead of snapping. Gated on
+   interpolate-size so browsers that cannot animate to 'auto' keep the native
+   <details> behaviour rather than a half-working one. */
+@supports (interpolate-size: allow-keywords) {
+  .faq {
+    interpolate-size: allow-keywords;
+  }
+
+  .faq::details-content {
+    block-size: 0;
+    opacity: 0;
+    overflow: clip;
+    transition:
+      block-size 250ms var(--ease-out),
+      opacity 200ms ease,
+      content-visibility 250ms allow-discrete;
+  }
+
+  .faq[open]::details-content {
+    block-size: auto;
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .faq::details-content {
+      transition:
+        opacity 200ms ease,
+        content-visibility 200ms allow-discrete;
+    }
   }
 }
 

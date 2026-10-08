@@ -54,13 +54,13 @@ export function DenominationPage({ denomination: d }: { denomination: Denominati
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="#demo"
-              className="px-8 py-4 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold hover:shadow-2xl hover:shadow-gold-500/25 transition-all duration-300 transform hover:-translate-y-1"
+              className="press hover-glow px-8 py-4 bg-gradient-to-r from-gold-500 to-gold-400 text-primary-900 rounded-lg font-semibold"
             >
               Request a Demo <ArrowRight className="inline-block ml-2 w-5 h-5" />
             </a>
             <Link
               href="/for-pastors"
-              className="px-8 py-4 border-2 border-gold-500/40 text-gold-400 rounded-lg font-semibold hover:bg-gold-500/10 transition-all duration-300"
+              className="press px-8 py-4 border-2 border-gold-500/40 text-gold-400 rounded-lg font-semibold hover:bg-gold-500/10"
             >
               Read the five-minute brief
             </Link>
@@ -128,10 +128,10 @@ export function DenominationPage({ denomination: d }: { denomination: Denominati
           </div>
           <div className="divide-y divide-primary-900/10 border-y border-primary-900/10">
             {d.faq.map((item, i) => (
-              <details key={i} className="group py-5">
+              <details key={i} className="faq group py-5">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-left font-semibold text-primary-900">
                   {item.q}
-                  <span className="text-gold-600 transition group-open:rotate-180">&#8964;</span>
+                  <span className="text-gold-600 transition-transform duration-[250ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-open:rotate-180">&#8964;</span>
                 </summary>
                 <p className="mt-3 leading-relaxed text-primary-700/70">{item.a}</p>
               </details>

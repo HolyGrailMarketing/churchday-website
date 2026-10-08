@@ -524,7 +524,7 @@ export default function ForPastors() {
                 track('pastors_cta', { placement: 'chrome' })
                 goTo(CHAPTERS.length - 1)
               }}
-              className="rounded-md bg-gradient-to-r from-gold-500 to-gold-400 px-3.5 py-1.5 text-[13px] font-semibold text-primary-900 transition hover:shadow-lg hover:shadow-gold-500/20"
+              className="press hover-glow rounded-md bg-gradient-to-r from-gold-500 to-gold-400 px-3.5 py-1.5 text-[13px] font-semibold text-primary-900"
             >
               Request a demo
             </button>
@@ -615,7 +615,7 @@ export default function ForPastors() {
               <button
                 type="button"
                 onClick={() => goTo(1)}
-                className="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-gold-500 to-gold-400 px-6 py-3 font-semibold text-primary-900 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-gold-500/25"
+                className="press hover-glow inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-gold-500 to-gold-400 px-6 py-3 font-semibold text-primary-900"
               >
                 Read the brief <ArrowDown className="h-4 w-4" />
               </button>
@@ -625,7 +625,7 @@ export default function ForPastors() {
                   track('pastors_cta', { placement: 'cover' })
                   goTo(CHAPTERS.length - 1)
                 }}
-                className="rounded-md border border-gold-500/40 px-6 py-3 font-semibold text-gold-400 transition hover:bg-gold-500/10"
+                className="press rounded-md border border-gold-500/40 px-6 py-3 font-semibold text-gold-400 hover:bg-gold-500/10"
               >
                 Request a demo
               </button>
@@ -906,7 +906,12 @@ export default function ForPastors() {
               })}
             </ul>
 
-            <div className="min-h-[320px] border-t border-primary-900/10 pt-8 md:border-l md:border-t-0 md:pl-10 md:pt-0">
+            {/* Keyed on the feature so the panel cross-fades in instead of
+                swapping all at once. */}
+            <div
+              key={feature}
+              className="animate-caption min-h-[320px] border-t border-primary-900/10 pt-8 md:border-l md:border-t-0 md:pl-10 md:pt-0"
+            >
               <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-[3px] bg-primary-900">
                 <ActiveIcon className="h-5 w-5 text-gold-400" />
               </div>
@@ -1143,7 +1148,7 @@ export default function ForPastors() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => track('portal_signup', { from: 'for_pastors' })}
-              className="inline-flex items-center gap-2 rounded-md bg-primary-900 px-6 py-3 font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary-900/25"
+              className="press hover-glow-ink inline-flex items-center gap-2 rounded-md bg-primary-900 px-6 py-3 font-semibold text-white"
             >
               Set up your church <ArrowRight className="h-4 w-4" />
             </a>
@@ -1197,8 +1202,8 @@ export default function ForPastors() {
             </div>
 
             {sent ? (
-              <div className="flex flex-col justify-center rounded-[3px] border border-gold-500/30 bg-white/5 p-8">
-                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-gold-500">
+              <div className="animate-caption flex flex-col justify-center rounded-[3px] border border-gold-500/30 bg-white/5 p-8">
+                <div className="animate-pop mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-gold-500">
                   <Check className="h-5 w-5 text-primary-900" />
                 </div>
                 <h3 className="font-display text-2xl font-semibold text-white">
@@ -1301,7 +1306,7 @@ export default function ForPastors() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-[3px] bg-gradient-to-r from-gold-500 to-gold-400 px-6 py-3.5 font-semibold text-primary-900 transition hover:shadow-xl hover:shadow-gold-500/20 disabled:opacity-60"
+                  className="press hover-glow inline-flex w-full items-center justify-center gap-2 rounded-[3px] bg-gradient-to-r from-gold-500 to-gold-400 px-6 py-3.5 font-semibold text-primary-900 disabled:opacity-60"
                 >
                   {submitting ? 'Sending…' : 'Request your demo'}
                   {!submitting && <ArrowRight className="h-4 w-4" />}
