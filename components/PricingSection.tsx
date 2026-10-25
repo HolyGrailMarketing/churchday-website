@@ -3,7 +3,7 @@
 import { track } from '@/lib/analytics'
 import { CheckCircle2 } from 'lucide-react'
 import { portalSignupUrl } from '@/lib/constants'
-import { PLANS, foundingOfferFor, formatJmd, shareOfGiving, type Plan } from '@/lib/plans'
+import { PLANS, NO_CUT_LINE, foundingOfferFor, formatJmd, type Plan } from '@/lib/plans'
 
 /**
  * `sourcePrefix` tags which page a pricing conversion came from — homepage
@@ -26,11 +26,11 @@ export function PricingSection({
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <p className="eyebrow">Pricing</p>
-          <h2 className="headline mt-3">Start free. Pay when your giving grows.</h2>
+          <h2 className="headline mt-3">Free for churches up to 100 active members.</h2>
           <p className="lede mt-5 max-w-2xl mx-auto">
             Your whole congregation can use ChurchDay for free, with giving working from
-            day one. Plans are banded on what comes through the app each month &mdash; not
-            on how many members you have.
+            day one. Plans are sized by how many people use the app &mdash; never by your
+            giving.
           </p>
         </div>
 
@@ -45,10 +45,14 @@ export function PricingSection({
           ))}
         </div>
 
-        {/* The answer to "it's expensive", stated once rather than per card. */}
-        <p className="mt-10 text-center text-sm text-primary-700/60">
-          Every paid plan costs under 1.6% of the giving it covers. Annual billing is ten
-          months for twelve, and you can move between plans whenever you like.
+        {/* The "no cut of giving" line. Same words as the homepage giving section
+            and the pastors' FAQ, from one constant. */}
+        <p className="mt-10 text-center text-[15px] font-medium text-primary-900 max-w-2xl mx-auto">
+          {NO_CUT_LINE}
+        </p>
+        <p className="mt-3 text-center text-sm text-primary-700/60">
+          &ldquo;Active&rdquo; means seen in the app in the last 90 days. Annual billing is
+          ten months for twelve, and you can move between plans whenever you like.
         </p>
       </div>
     </section>
@@ -65,7 +69,6 @@ function PlanCard({
   onContactSales?: () => void
 }) {
   const dark = plan.highlighted
-  const share = shareOfGiving(plan)
   const founding = foundingOfferFor(plan)
 
   return (
@@ -118,14 +121,13 @@ function PlanCard({
         )}
       </div>
 
-      {/* Annual line, and the share-of-giving ratio that justifies the price. */}
+      {/* Annual line. */}
       <p className={`text-xs mb-6 ${dark ? 'text-white/45' : 'text-primary-700/55'}`}>
         {founding
           ? `or J$${formatJmd(founding.annual)} a year — your price for ${founding.months} months`
           : plan.annual
             ? `or J$${formatJmd(plan.annual)} a year — ten months for twelve`
             : 'No card, and no end date'}
-        {share !== null && ` · ${(share * 100).toFixed(2)}% of the giving it covers`}
       </p>
 
       <p
@@ -133,9 +135,9 @@ function PlanCard({
           dark ? 'text-gold-400 border-white/10' : 'text-primary-600 border-primary-100'
         }`}
       >
-        {plan.givingCeiling === null
-          ? 'No ceiling on giving'
-          : `Giving up to J$${formatJmd(plan.givingCeiling)} a month`}
+        {plan.activeMembers === null
+          ? 'Any number of active members'
+          : `Up to ${formatJmd(plan.activeMembers)} active members`}
       </p>
 
       <ul className="space-y-3 mb-8">

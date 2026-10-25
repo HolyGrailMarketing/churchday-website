@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { track } from '@/lib/analytics'
 import { DEMO_DENOMINATION_OPTIONS } from '@/data/denominations'
 import { PORTAL_SIGNUP_URL } from '@/lib/constants'
-import { PLANS, FOUNDING_OFFER, foundingOfferFor, planForGiving, formatJmd } from '@/lib/plans'
+import { PLANS, FOUNDING_OFFER, NO_CUT_FAQ, foundingOfferFor, planForMembers, formatJmd } from '@/lib/plans'
 import {
   ArrowDown,
   ArrowRight,
@@ -251,6 +251,9 @@ const QUESTIONS = [
     q: 'Is our information safe?',
     a: 'Giving is secure and private. Leaders see only what their role allows, and members’ personal information is protected.',
   },
+  // Shared with the homepage and pricing so the wording can never drift; the
+  // FAQPage JSON-LD below is built from this list, so it matches too.
+  NO_CUT_FAQ,
 ]
 
 const STEPS = [
@@ -350,10 +353,9 @@ export default function ForPastors() {
   const [tourTouched, setTourTouched] = useState(false)
   const [feature, setFeature] = useState(0)
   const [openQuestion, setOpenQuestion] = useState<number | null>(0)
-  // Banded on monthly digital giving, not member count — the pricing model
-  // meters what comes through the app. Default sits just inside Ministry, which
-  // is where a church with a working giving flow lands within a month or two.
-  const [giving, setGiving] = useState(250_000)
+  // Plans are sized by active members, never by giving. Default sits inside the
+  // free plan, which is where most Jamaican congregations land.
+  const [members, setMembers] = useState(80)
   const [revealed, setRevealed] = useState<number | null>(null)
 
   const [form, setForm] = useState({ name: '', email: '', church: '', denomination: '', phone: '', day: '', time: '' })
@@ -444,7 +446,7 @@ export default function ForPastors() {
     return () => window.removeEventListener('keydown', onKey)
   }, [active, goTo])
 
-  const recommended = planForGiving(giving)
+  const recommended = planForMembers(members)
   const plan = PLANS.findIndex((p) => p.id === recommended.id)
 
   const submit = async (e: React.FormEvent) => {
@@ -1002,22 +1004,22 @@ export default function ForPastors() {
           </h2>
 
           <div className="doc-no-print mt-8 max-w-xl">
-            <label htmlFor="giving" className="text-[14px] text-primary-900/70">
-              Roughly how much giving would come through the app each month?
+            <label htmlFor="members" className="text-[14px] text-primary-900/70">
+              Roughly how many people would use the app each month?
             </label>
             <div className="mt-3 flex items-center gap-4">
               <input
-                id="giving"
+                id="members"
                 type="range"
-                min={0}
-                max={1_200_000}
-                step={25_000}
-                value={giving}
-                onChange={(e) => setGiving(Number(e.target.value))}
+                min={10}
+                max={400}
+                step={10}
+                value={members}
+                onChange={(e) => setMembers(Number(e.target.value))}
                 className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-primary-900/15 accent-gold-500"
               />
               <span className="w-28 shrink-0 text-right font-display text-xl font-semibold tabular-nums text-primary-900">
-                {giving >= 1_200_000 ? 'J$1.2M+' : `J$${formatJmd(giving)}`}
+                {members >= 400 ? '400+' : formatJmd(members)}
               </span>
             </div>
             <p className="mt-3 text-[14px] text-primary-900/60">
@@ -1029,7 +1031,7 @@ export default function ForPastors() {
                   ? ` — J$${formatJmd(foundingOfferFor(recommended)!.price)} per month at the
                       Founding Church rate, instead of J$${formatJmd(recommended.price)}.`
                   : ` — J$${formatJmd(recommended.price)} per month.`}{' '}
-              Your members are never counted or capped.
+              Your giving is never counted, and ChurchDay takes no cut of it.
             </p>
           </div>
 
@@ -1071,9 +1073,9 @@ export default function ForPastors() {
                     </p>
                   )}
                   <p className="mt-1 text-[13px] font-medium text-gold-700">
-                    {item.givingCeiling === null
-                      ? 'No ceiling on giving'
-                      : `Giving up to J$${formatJmd(item.givingCeiling)} a month`}
+                    {item.activeMembers === null
+                      ? 'Any number of active members'
+                      : `Up to ${formatJmd(item.activeMembers)} active members`}
                   </p>
                   <ul className="mt-5 space-y-2.5 border-t border-primary-900/8 pt-5">
                     {item.features.map((f) => (
@@ -1089,10 +1091,10 @@ export default function ForPastors() {
           </div>
 
           <p className="mt-8 text-[14px] text-primary-900/55">
-            The Congregation plan is free for your whole church, with no card and no trial
-            running out. Plans are banded on the giving that comes through the app, never on
-            your membership — and every paid plan costs under 1.6% of the giving it covers.
-            Annual billing is ten months for twelve.
+            The Congregation plan is free for churches up to 100 active members, with no card
+            and no trial running out. Plans are sized by the people who use the app, never by
+            your giving, and ChurchDay takes no cut of it. Deacons and finance viewers are always
+            free. Annual billing is ten months for twelve.
             {FOUNDING_OFFER && (
               <>
                 {' '}
@@ -1153,7 +1155,7 @@ export default function ForPastors() {
               Set up your church <ArrowRight className="h-4 w-4" />
             </a>
             <p className="text-[15px] text-primary-900/60">
-              Free for 30 days — card verified at signup, nothing charged until day 30. Would rather be walked through it?{' '}
+              Free for churches up to 100 active members — no card, no trial to run out. Would rather be walked through it?{' '}
               <button
                 type="button"
                 onClick={() => {
@@ -1177,7 +1179,7 @@ export default function ForPastors() {
                 Let&rsquo;s bring your church online together.
               </h2>
               <p className="mt-5 max-w-md text-[17px] leading-relaxed text-white/65">
-                Spend less time on admin and more time with your people. Try ChurchDay free for 30 days —
+                Spend less time on admin and more time with your people. Start ChurchDay free —
                 we&rsquo;ll help you every step of the way.
               </p>
               <p className="mt-10 text-[11px] uppercase tracking-[0.3em] text-gold-400/70">

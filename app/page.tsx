@@ -18,6 +18,7 @@ import { PORTAL_SIGNUP_URL } from '@/lib/constants'
 import { Nav } from '@/components/Nav'
 import { Footer } from '@/components/Footer'
 import { PricingSection } from '@/components/PricingSection'
+import { NO_CUT_LINE } from '@/lib/plans'
 import { AppTour, Phone } from '@/components/home/AppTour'
 import { DemoScheduler } from '@/components/home/DemoScheduler'
 import { Reveal } from '@/components/home/Reveal'
@@ -183,7 +184,7 @@ export default function Home() {
           <div className="mt-14 grid grid-cols-1 md:grid-cols-6 gap-4">
             {/* Giving — the reason most churches come, so it gets the big tile */}
             <Reveal className="md:col-span-4 md:row-span-2">
-              <div className="relative h-full min-h-[420px] overflow-hidden rounded-[28px] bg-primary-900 p-8 sm:p-10 text-white">
+              <div className="relative h-full min-h-[760px] sm:min-h-[420px] overflow-hidden rounded-[28px] bg-primary-900 p-8 sm:p-10 text-white">
                 <div className="relative z-10 max-w-[19rem]">
                   <HandCoins className="w-7 h-7 text-gold-400" aria-hidden />
                   <h3 className="mt-5 text-[28px] sm:text-[32px] font-bold leading-[1.1] tracking-[-0.025em]">
@@ -193,6 +194,7 @@ export default function Home() {
                     Online tithes and offerings, contribution history for every giver, and
                     campaigns your church can watch fill up.
                   </p>
+                  <p className="mt-4 text-[15px] leading-relaxed text-gold-200">{NO_CUT_LINE}</p>
                 </div>
                 <div className="absolute -bottom-24 sm:-bottom-32 right-[-8%] sm:right-8 w-[62%] sm:w-[250px] rotate-[-4deg]">
                   <Phone src="/app-screens/give.png" alt="ChurchDay Give tab" />
@@ -287,7 +289,7 @@ export default function Home() {
           <h2 className="headline mt-8">Bring your church together this Sunday.</h2>
           <p className="lede mt-5 max-w-xl mx-auto">
             Set up free today, or let us show you around first. Either way, there&apos;s nothing to pay
-            until your giving grows.
+            until your church grows past 100 active members.
           </p>
           <div className="mt-9 flex flex-col sm:flex-row gap-3 justify-center">
             <button onClick={() => openSchedule('closing')} className="btn-ink">

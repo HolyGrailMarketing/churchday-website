@@ -69,7 +69,7 @@ export const denominations: Record<string, Denomination> = {
       },
       {
         q: 'What does it cost, and how long does setup take?',
-        a: 'Nothing to start. The Congregation plan is free for your whole church, with no card and no trial running out, and giving works from day one — up to J$150,000 a month. Past that, Ministry is J$9,500/month (or J$95,000 a year), which is under 1.6% of the giving it covers. Plans are banded on what comes through the app, not on how many members you have. Most churches are live within an afternoon — create your church, add your people at your own pace, and invite your congregation with one link.',
+        a: 'Nothing to start. The Congregation plan is free for churches up to 100 active members, with no card and no trial running out, and giving works from day one. Past that, Ministry is J$4,500/month (or J$45,000 a year). Plans are sized by the people who use the app, never by your giving — ChurchDay takes no cut of your offering; the only deduction is the card processor’s fee, shown on every receipt. Most churches are live within an afternoon — create your church, add your people at your own pace, and invite your congregation with one link.',
       },
     ],
     demoSourceTag: 'ntcog',
@@ -119,7 +119,7 @@ export const denominations: Record<string, Denomination> = {
       },
       {
         q: 'What does it cost, and how long does setup take?',
-        a: 'Nothing to start. The Congregation plan is free for your whole church, with no card and no trial running out, and giving works from day one — up to J$150,000 a month. Past that, Ministry is J$9,500/month (or J$95,000 a year), which is under 1.6% of the giving it covers. Plans are banded on what comes through the app, not on how many members you have. Most churches are live within an afternoon — create your church, add your people at your own pace, and invite your congregation with one link.',
+        a: 'Nothing to start. The Congregation plan is free for churches up to 100 active members, with no card and no trial running out, and giving works from day one. Past that, Ministry is J$4,500/month (or J$45,000 a year). Plans are sized by the people who use the app, never by your giving — ChurchDay takes no cut of your offering; the only deduction is the card processor’s fee, shown on every receipt. Most churches are live within an afternoon — create your church, add your people at your own pace, and invite your congregation with one link.',
       },
     ],
     demoSourceTag: 'jbu',
@@ -171,7 +171,7 @@ export const denominations: Record<string, Denomination> = {
       },
       {
         q: 'What does it cost, and how long does setup take?',
-        a: 'Nothing to start. The Congregation plan is free for your whole church, with no card and no trial running out, and giving works from day one — up to J$150,000 a month. Past that, Ministry is J$9,500/month (or J$95,000 a year), which is under 1.6% of the giving it covers. Plans are banded on what comes through the app, not on how many members you have. Most churches are live within an afternoon — create your church, add your people at your own pace, and invite your congregation with one link.',
+        a: 'Nothing to start. The Congregation plan is free for churches up to 100 active members, with no card and no trial running out, and giving works from day one. Past that, Ministry is J$4,500/month (or J$45,000 a year). Plans are sized by the people who use the app, never by your giving — ChurchDay takes no cut of your offering; the only deduction is the card processor’s fee, shown on every receipt. Most churches are live within an afternoon — create your church, add your people at your own pace, and invite your congregation with one link.',
       },
     ],
     demoSourceTag: 'cogop',
@@ -223,7 +223,7 @@ export const denominations: Record<string, Denomination> = {
       },
       {
         q: 'What does it cost, and how long does setup take?',
-        a: 'Nothing to start. The Congregation plan is free for your whole church, with no card and no trial running out, and giving works from day one — up to J$150,000 a month. Past that, Ministry is J$9,500/month (or J$95,000 a year), which is under 1.6% of the giving it covers. Plans are banded on what comes through the app, not on how many members you have. Most churches are live within an afternoon — create your church, add your people at your own pace, and invite your congregation with one link.',
+        a: 'Nothing to start. The Congregation plan is free for churches up to 100 active members, with no card and no trial running out, and giving works from day one. Past that, Ministry is J$4,500/month (or J$45,000 a year). Plans are sized by the people who use the app, never by your giving — ChurchDay takes no cut of your offering; the only deduction is the card processor’s fee, shown on every receipt. Most churches are live within an afternoon — create your church, add your people at your own pace, and invite your congregation with one link.',
       },
     ],
     demoSourceTag: 'ucjci',
