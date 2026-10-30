@@ -80,8 +80,8 @@ export const PLANS: Plan[] = [
   {
     id: 'multisite',
     name: 'Multi-site',
-    price: 28_000,
-    annual: 280_000,
+    price: 9_500,
+    annual: 95_000,
     activeMembers: null,
     description: 'For a church with more than one location',
     features: [
